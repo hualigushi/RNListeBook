@@ -195,3 +195,16 @@ export default Detail;
 1. ` npm install dva-core-ts react-redux -S`
 2. `npm install @types/react-redux -D`
 3. `npm install dva-loading-ts -S`
+
+## 图标
+1. `npm install react-native-svg -S`
+
+2. `npm install react-native-iconfont-cli -D`
+   用纯JS把iconfont.cn的图标转换成RN组件，不依赖字体，支持多色彩，支持热更新
+
+3. 生成配置文件
+   `npx iconfont-init`  
+
+4. 修改`iconfont.json`文件
+5. 开始生成React-Native标准组件
+    `npx iconfont-rn`
