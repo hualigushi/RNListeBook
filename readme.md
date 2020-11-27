@@ -208,3 +208,6 @@ export default Detail;
 4. 修改`iconfont.json`文件
 5. 开始生成React-Native标准组件
     `npx iconfont-rn`
+
+## 顶部标签导航器
+1. `npm install @react-navigation/material-top-tabs react-native-tab-view -S`

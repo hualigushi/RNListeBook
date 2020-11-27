@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/stack';
 import BottomTabs from './BottomTabs';
 import Detail from '@/pages/Detail';
-import {Platform, StyleSheet} from 'react-native';
+import {Platform, StatusBar, StyleSheet} from 'react-native';
 
 export type RootStackParamList = {
   BottomTabs: {
@@ -35,6 +35,7 @@ const Navigator: React.FC = () => {
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // 跳转页面卡片加载方向为从右向左
           gestureEnabled: true, // 手势
           gestureDirection: 'horizontal', // 手势为水平方向
+          headerStatusBarHeight: StatusBar.currentHeight, // 状态栏高度
           // 安卓上没有阴影，只有投影，即不能改变光源
           headerStyle: {
             ...Platform.select({

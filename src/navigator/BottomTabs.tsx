@@ -11,8 +11,9 @@ import {
   RouteProp,
   TabNavigationState,
 } from '@react-navigation/native';
+import HomeTabs from './HomeTabs';
 export type BottomTabParamList = {
-  Home: undefined;
+  HomeTabs: undefined;
   Listen: undefined;
   Found: undefined;
   Account: undefined;
@@ -28,7 +29,7 @@ interface IProps {
 }
 
 const getHeaderTitle = (route: Route) => {
-  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeTabs';
 
   switch (routeName) {
     case 'Home':
@@ -52,11 +53,11 @@ const BottomTabs: React.FC<IProps> = ({navigation, route}) => {
   return (
     <Tab.Navigator
       tabBarOptions={{
-        activeBackgroundColor: '#f86442',
+        activeTintColor: '#f86442',
       }}>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="HomeTabs"
+        component={HomeTabs}
         options={{
           tabBarLabel: '首页',
           tabBarIcon: ({color, size}) => (
