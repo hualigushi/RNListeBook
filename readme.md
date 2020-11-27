@@ -190,3 +190,8 @@ export default Detail;
 
 4. 标签导航器
 `npm install @react-navigation/bottom-tabs`
+
+## DVA
+1. ` npm install dva-core-ts react-redux -S`
+2. `npm install @types/react-redux -D`
+3. `npm install dva-loading-ts -S`
