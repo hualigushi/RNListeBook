@@ -1,3 +1,4 @@
+import {ICarousel} from '@/models/home';
 import {hp, viewportWidth, wp} from '@/utils/index';
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -11,7 +12,11 @@ const slideWidth = viewportWidth;
 const sidewidth = wp(90);
 const sideHeight = hp(26);
 const itemWidth = sidewidth + wp(2) * 2;
-const Carousel: React.FC = () => {
+
+interface Iprops {
+  data: ICarousel[];
+}
+const Carousel: React.FC<Iprops> = ({data}) => {
   const [activeSlide, setActiveSlide] = useState<number>(0);
 
   const onSnapToItem = (index: number) => {
@@ -19,12 +24,12 @@ const Carousel: React.FC = () => {
   };
 
   const renderItem = (
-    {item}: {item: string},
+    {item}: {item: ICarousel},
     parallaxProps?: AdditionalParallaxProps,
   ) => {
     return (
       <ParallaxImage
-        source={{uri: item}}
+        source={{uri: item.image}}
         style={styles.image}
         parallaxFactor={0.8}
         containerStyle={styles.imageContainer}
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
   },
   image: {
     ...StyleSheet.absoluteFillObject,
-    resizeMOde: 'cover',
+    resizeMode: 'cover',
   },
   paginationWrapper: {
     justifyContent: 'center',
