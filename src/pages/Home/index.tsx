@@ -1,8 +1,9 @@
 import React from 'react';
 import {Button, Text, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
-import {RootState} from '../models';
-import {RootStackNavigation} from '../navigator';
+import {RootState} from '@/models/index';
+import {RootStackNavigation} from '@/navigator/index';
+import Carousel from './Carousel';
 
 const mapStateToProps = ({home, loading}: RootState) => ({
   num: home.num,
@@ -23,6 +24,7 @@ const Home: React.FC<Iprops> = ({navigation}) => {
     <View>
       <Text>Home</Text>
       <Button title="跳转" onPress={onPress} />
+      <Carousel />
     </View>
   );
 };

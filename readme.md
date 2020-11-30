@@ -211,3 +211,7 @@ export default Detail;
 
 ## 顶部标签导航器
 1. `npm install @react-navigation/material-top-tabs react-native-tab-view -S`
+
+## 轮播图
+1. `npm install react-native-snap-carousel -S`
+2. `npm install @types/react-native-snap-carousel -D`
