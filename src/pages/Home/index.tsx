@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, Text, View} from 'react-native';
+import {ScrollView} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import {RootState} from '@/models/index';
 import {RootStackNavigation} from '@/navigator/index';
 import Carousel from './Carousel';
 import {useEffect} from 'react';
+import Guess from './Guess';
 
 const mapStateToProps = ({home, loading}: RootState) => ({
   carousels: home.carousels,
@@ -23,9 +24,10 @@ const Home: React.FC<Iprops> = ({dispatch, carousels}) => {
   }, [dispatch]);
 
   return (
-    <View>
+    <ScrollView>
       <Carousel data={carousels} />
-    </View>
+      <Guess />
+    </ScrollView>
   );
 };
 
