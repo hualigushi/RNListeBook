@@ -1,6 +1,7 @@
 import {Effect, Model} from 'dva-core-ts';
 import {Reducer} from 'redux';
 import axios from 'axios';
+import { RootState } from '.';
 
 //轮播图
 const CAROUSEL_URL = '/mock/9203/carousel';
@@ -32,6 +33,12 @@ export interface HomeState {
   carousels: ICarousel[];
   guess: IGUESS[];
   channels: IChannel[];
+  pagination: IPagination;
+}
+export interface IPagination {
+  current: number;
+  total: number;
+  hasMore: boolean;
 }
 interface HomeModel extends Model {
   namespace: 'home';
@@ -50,6 +57,11 @@ const initialState = {
   carousels: [],
   guess: [],
   channels: [],
+  pagination: {
+    current: 1,
+    total: 0,
+    hasMore: true,
+  },
 };
 const homeModel: HomeModel = {
   namespace: 'home',
@@ -82,12 +94,30 @@ const homeModel: HomeModel = {
         },
       });
     },
-    *fetchChannels({callback}, {call, put}) {
-      const {data} = yield call(axios.get, CHANNEL_URL);
+    *fetchChannels({callback, payload}, {call, put, select}) {
+      const {channels, pagination} = yield select((state: RootState) => state.home);
+      let page = 1;
+      if (payload && payload.loadMore) {
+        page = pagination.current + 1;
+      }
+      const {data} = yield call(axios.get, CHANNEL_URL,{
+        params: {
+          page,
+        },
+      });
+      let newChannels = data.results;
+      if (payload && payload.loadMore) {
+        newChannels = channels.concat(newChannels);
+      }
       yield put({
         type: 'setState',
         payload: {
-          channels: data.results,
+          channels: newChannels,
+          pagination: {
+            current: data.pagination.current,
+            total: data.pagination.total,
+            hasMore: newChannels.length < data.pagination.total,
+          },
         },
       });
       if (typeof callback === 'function') {
