@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ListRenderItemInfo, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import {RootState} from '@/models/index';
@@ -20,7 +20,10 @@ type ModelState = ConnectedProps<typeof connector>;
 interface Iprops extends ModelState {
   navigation: RootStackNavigation;
 }
+
 const Home: React.FC<Iprops> = ({dispatch, carousels, channels}) => {
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
   useEffect(() => {
     dispatch({
       type: 'home/fetchCarousels',
@@ -32,6 +35,16 @@ const Home: React.FC<Iprops> = ({dispatch, carousels, channels}) => {
 
   const onPress = (data: IChannel) => {
     console.log(data);
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch({
+      type: 'home/fetchChannels',
+      callback: () => {
+        setRefreshing(false);
+      },
+    });
   };
 
   const renderItem = ({item}: ListRenderItemInfo<IChannel>) => {
@@ -56,6 +69,8 @@ const Home: React.FC<Iprops> = ({dispatch, carousels, channels}) => {
       data={channels}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
     />
   );
 };
