@@ -215,3 +215,5 @@ export default Detail;
 ## 轮播图
 1. `npm install react-native-snap-carousel -S`
 2. `npm install @types/react-native-snap-carousel -D`
+
+## 安卓端不支持阴影效果，只支持投影效果

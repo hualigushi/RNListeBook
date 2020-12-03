@@ -20,9 +20,18 @@ export interface IGUESS {
   title: string;
   image: string;
 }
+export interface IChannel {
+  id: string;
+  title: string;
+  image: string;
+  remark: string;
+  played: number;
+  playing: number;
+}
 export interface HomeState {
   carousels: ICarousel[];
   guess: IGUESS[];
+  channels: IChannel[];
 }
 interface HomeModel extends Model {
   namespace: 'home';
@@ -33,12 +42,14 @@ interface HomeModel extends Model {
   effects: {
     fetchCarousels: Effect;
     fetchGuess: Effect;
+    fetchChannels: Effect;
   };
 }
 
 const initialState = {
   carousels: [],
   guess: [],
+  channels: [],
 };
 const homeModel: HomeModel = {
   namespace: 'home',
@@ -68,6 +79,15 @@ const homeModel: HomeModel = {
         type: 'setState',
         payload: {
           guess: data,
+        },
+      });
+    },
+    *fetchChannels(_, {call, put}) {
+      const {data} = yield call(axios.get, CHANNEL_URL);
+      yield put({
+        type: 'setState',
+        payload: {
+          channels: data.results,
         },
       });
     },

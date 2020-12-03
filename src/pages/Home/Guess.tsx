@@ -34,6 +34,10 @@ const Guess: React.FC<ModelState> = ({dispatch, guess}) => {
     );
   };
 
+  const keyExtractor = (item: IGUESS) => {
+    return item.id;
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -51,6 +55,7 @@ const Guess: React.FC<ModelState> = ({dispatch, guess}) => {
         numColumns={3}
         data={guess}
         renderItem={renderItem}
+        keyExtractor={keyExtractor}
       />
       <Touchable style={styles.changeGuess} onPress={fetch}>
         <Icon name="icon-huanyipi" color="red" />
