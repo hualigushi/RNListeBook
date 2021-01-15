@@ -2,7 +2,6 @@ import axios from 'axios';
 import Config from 'react-native-config';
 
 axios.defaults.baseURL = Config.API_URL;
-
 axios.interceptors.request.use(
   function (config: any) {
     return config;

@@ -217,3 +217,12 @@ export default Detail;
 2. `npm install @types/react-native-snap-carousel -D`
 
 ## 安卓端不支持阴影效果，只支持投影效果
+
+## 渐变色
+`npm install react-native-linear-gradient -S`
+
+## 渐变色过渡动画
+`npm install react-native-linear-animated-gradient-transition -S`
+
+## 样式合并
+`StyleSheet.compose(indicatorStyle,styles.whiteBackgroundColor)`

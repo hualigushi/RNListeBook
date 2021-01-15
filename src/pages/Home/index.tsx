@@ -1,20 +1,27 @@
 import React, {useState} from 'react';
-import {ListRenderItemInfo, StyleSheet, View} from 'react-native';
+import {
+  ListRenderItemInfo,
+  NativeScrollEvent,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import {RootState} from '@/models/index';
 import {RootStackNavigation} from '@/navigator/index';
-import Carousel from './Carousel';
+import Carousel, {sideHeight} from './Carousel';
 import {useEffect} from 'react';
 import Guess from './Guess';
 import {FlatList} from 'react-native-gesture-handler';
 import {IChannel} from '@/models/home';
 import ChannelItem from './ChannelItem';
 import {Text} from 'react-native';
+import {NativeSyntheticEvent} from 'react-native';
 
 const mapStateToProps = ({home, loading}: RootState) => ({
   carousels: home.carousels,
   channels: home.channels,
   hasMore: home.pagination.hasMore,
+  gradientVisible: home.gradientVisible,
   loading: loading.effects['home/fetchCarousels'],
 });
 const connector = connect(mapStateToProps);
@@ -25,10 +32,10 @@ interface Iprops extends ModelState {
 
 const Home: React.FC<Iprops> = ({
   dispatch,
-  carousels,
   channels,
   loading,
   hasMore,
+  gradientVisible,
 }) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
@@ -46,7 +53,6 @@ const Home: React.FC<Iprops> = ({
   };
 
   const onRefresh = () => {
-    console.log('onRefresh---');
     setRefreshing(true);
     dispatch({
       type: 'home/fetchChannels',
@@ -73,6 +79,20 @@ const Home: React.FC<Iprops> = ({
     return <ChannelItem data={item} onPress={onPress} />;
   };
 
+  // 页面往下滚动时，判断滚动距离是否超过轮播图高度，是则隐藏渐变色
+  const onScroll = ({nativeEvent}: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetY = nativeEvent.contentOffset.y;
+    let newGradientVisible = offsetY < sideHeight;
+    if (gradientVisible !== newGradientVisible) {
+      dispatch({
+        type: 'home/setState',
+        payload: {
+          gradientVisible,
+        },
+      });
+    }
+  };
+
   const keyExtractor = (item: IChannel) => {
     return item.id;
   };
@@ -80,8 +100,11 @@ const Home: React.FC<Iprops> = ({
   const header = () => {
     return (
       <View>
-        <Carousel data={carousels} />
-        <Guess />
+        <Carousel />
+        {/* 往上滚动时，猜你喜欢覆盖渐变色效果 */}
+        <View style={styles.background}>
+          <Guess />
+        </View>
       </View>
     );
   };
@@ -128,6 +151,7 @@ const Home: React.FC<Iprops> = ({
       refreshing={refreshing}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.2}
+      onScroll={onScroll}
     />
   );
 };
@@ -144,6 +168,9 @@ const styles = StyleSheet.create({
   empty: {
     alignItems: 'center',
     paddingVertical: 100,
+  },
+  background: {
+    backgroundColor: '#fff',
   },
 });
 export default connector(Home);

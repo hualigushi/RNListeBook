@@ -27,26 +27,26 @@ interface IProps {
   route: Route;
 }
 
-const getHeaderTitle = (route: Route) => {
+const getHeaderTitle:(route: Route) => [string, boolean] = (route: Route) => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeTabs';
-
   switch (routeName) {
-    case 'Home':
-      return '首页';
+    case 'HomeTabs':
+      return ['', true];
     case 'Listen':
-      return '我听';
+      return ['我听', false];
     case 'Found':
-      return '发现';
+      return ['发现', false];
     case 'Account':
-      return '账户';
+      return ['账户', false];
     default:
-      return '首页';
+      return ['首页', false];
   }
 };
 const BottomTabs: React.FC<IProps> = ({navigation, route}) => {
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: getHeaderTitle(route),
+      headerTransparent: getHeaderTitle(route)[1], // 顶部标题栏是否透明
+      headerTitle: getHeaderTitle(route)[0],
     });
   }, [navigation, route]);
   return (

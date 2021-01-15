@@ -1,7 +1,7 @@
 import {Effect, Model} from 'dva-core-ts';
 import {Reducer} from 'redux';
 import axios from 'axios';
-import { RootState } from '.';
+import {RootState} from './index';
 
 //轮播图
 const CAROUSEL_URL = '/mock/9203/carousel';
@@ -31,6 +31,8 @@ export interface IChannel {
 }
 export interface HomeState {
   carousels: ICarousel[];
+  gradientVisible: boolean; // 渐变色组件是否显示
+  activeCarouselIndex: number; // 当前轮播图的下表
   guess: IGUESS[];
   channels: IChannel[];
   pagination: IPagination;
@@ -55,6 +57,8 @@ interface HomeModel extends Model {
 
 const initialState = {
   carousels: [],
+  gradientVisible: true,
+  activeCarouselIndex: 0,
   guess: [],
   channels: [],
   pagination: {
@@ -81,7 +85,7 @@ const homeModel: HomeModel = {
       yield put({
         type: 'setState',
         payload: {
-          carousels: data,
+          carousels: data || [],
         },
       });
     },
@@ -95,12 +99,14 @@ const homeModel: HomeModel = {
       });
     },
     *fetchChannels({callback, payload}, {call, put, select}) {
-      const {channels, pagination} = yield select((state: RootState) => state.home);
+      const {channels, pagination} = yield select(
+        (state: RootState) => state.home,
+      );
       let page = 1;
       if (payload && payload.loadMore) {
         page = pagination.current + 1;
       }
-      const {data} = yield call(axios.get, CHANNEL_URL,{
+      const {data} = yield call(axios.get, CHANNEL_URL, {
         params: {
           page,
         },
