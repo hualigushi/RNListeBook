@@ -4,13 +4,11 @@ import axios from 'axios';
 import {RootState} from './index';
 
 //轮播图
-const CAROUSEL_URL = '/mock/9203/carousel';
-
-//猜你喜欢
-const GUESS_URL = '/mock/9203/guess';
-
+const CAROUSEL_URL = '/mock/11/bear/carousel';
 //首页列表
-const CHANNEL_URL = '/mock/9203/channel';
+const CHANNEL_URL = '/mock/11/bear/channel';
+//猜你喜欢
+const GUESS_URL = '/mock/11/bear/guess';
 export interface ICarousel {
   id: string;
   image: string;
