@@ -27,7 +27,7 @@ interface IProps {
   route: Route;
 }
 
-const getHeaderTitle:(route: Route) => [string, boolean] = (route: Route) => {
+const getHeaderTitle: (route: Route) => [string, boolean] = (route: Route) => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeTabs';
   switch (routeName) {
     case 'HomeTabs':

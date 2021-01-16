@@ -226,3 +226,7 @@ export default Detail;
 
 ## 样式合并
 `StyleSheet.compose(indicatorStyle,styles.whiteBackgroundColor)`
+
+## 本地持久库
+`npm install @react-native-community/async-storage -S`  只支持字符串类型
+`npm install react-native-storage -S` 二次封装
