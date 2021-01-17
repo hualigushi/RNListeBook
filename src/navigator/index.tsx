@@ -9,11 +9,13 @@ import {
 import BottomTabs from './BottomTabs';
 import Detail from '@/pages/Detail';
 import {Platform, StatusBar, StyleSheet} from 'react-native';
+import Category from '@/pages/category';
 
 export type RootStackParamList = {
   BottomTabs: {
     screen: string;
   };
+  Category: undefined;
   Detail: {
     // 导航传参
     id: number;
@@ -52,6 +54,13 @@ const Navigator: React.FC = () => {
           component={BottomTabs}
           options={{
             headerTitle: '首页',
+          }}
+        />
+        <Stack.Screen
+          name="Category"
+          component={Category}
+          options={{
+            headerTitle: '分类',
           }}
         />
         <Stack.Screen

@@ -34,8 +34,13 @@ const TopBarBarWrapper: React.FC<IProps> = ({
   linearColors = ['#ccc', '#e2e2e2'],
   gradientVisible,
   indicatorStyle,
+  navigation,
   ...props
 }) => {
+  const goCategory = () => {
+    navigation.navigate('Category');
+  };
+
   const getLinearGradient = () => {
     return (
       <>
@@ -75,7 +80,7 @@ const TopBarBarWrapper: React.FC<IProps> = ({
           indicatorStyle={newIndicatorStyle}
           style={styles.tabbar}
         />
-        <Touchable style={styles.categoryBtn}>
+        <Touchable style={styles.categoryBtn} onPress={goCategory}>
           <Text style={textStyle}>分类</Text>
         </Touchable>
       </View>

@@ -5,7 +5,7 @@ import {Reducer} from 'redux';
 
 const CATEGORY_URL = '11';
 
-interface ICategory {
+export interface ICategory {
   id: string;
   name: string;
   classify?: string;

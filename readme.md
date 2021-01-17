@@ -230,3 +230,6 @@ export default Detail;
 ## 本地持久库
 `npm install @react-native-community/async-storage -S`  只支持字符串类型
 `npm install react-native-storage -S` 二次封装
+
+## 处理数据结构
+`npm install lodash @types/lodash -S`
