@@ -77,8 +77,15 @@ const categoryModel: CategoryModel = {
         type: 'setState',
         payload: {
           isEdit: !category.isEdit,
+          myCategorys: payload.myCategorys,
         },
       });
+      if (category.isEdit) {
+        storage.save({
+          key: 'myCategorys',
+          data: payload.myCategorys,
+        });
+      }
     },
   },
   reducers: {
