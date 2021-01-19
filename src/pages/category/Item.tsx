@@ -11,8 +11,10 @@ interface IProps {
   disabled?: boolean;
 }
 
-const parentWidth = viewportWidth - 10;
-const itemWidth = parentWidth / 4;
+export const parentWidth = viewportWidth - 10;
+export const itemWidth = parentWidth / 4;
+export const itemHeight = 48;
+export const margin = 5;
 
 const Item: React.FC<IProps> = ({isEdit, selected, data, disabled}) => {
   return (
@@ -32,13 +34,13 @@ const Item: React.FC<IProps> = ({isEdit, selected, data, disabled}) => {
 const styles = StyleSheet.create({
   itemWrapper: {
     width: itemWidth,
-    height: 48,
+    height: itemHeight,
   },
   item: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 5,
+    margin: margin,
     backgroundColor: '#fff',
     borderRadius: 4,
   },

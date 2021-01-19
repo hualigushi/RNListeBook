@@ -236,3 +236,6 @@ export default Detail;
 
 ## 按钮库
 `npm install react-navigation-header-buttons -S`
+
+## 拖拽
+`npm install react-native-drag-sort -S`

@@ -5,10 +5,11 @@ import {StyleSheet, Text, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import _ from 'lodash';
 import {ScrollView} from 'react-native-gesture-handler';
-import Item from './Item';
+import Item, {itemHeight, itemWidth, margin, parentWidth} from './Item';
 import {RootStackNavigation} from '@/navigator/index';
 import HeaderRightBtn from './HeaderrightBtn';
 import Touchable from '@/components/Touchable';
+import {DragSortableView} from 'react-native-drag-sort';
 
 const mapStateToProps = ({category}: RootState) => {
   return {
@@ -53,16 +54,17 @@ const Category: React.FC<Iprops> = ({
     };
   }, [dispatch]);
 
-  const onSubmit = useCallback(
-    () =>
-      dispatch({
-        type: 'category/toggle',
-        payload: {
-          myCategorys: localmyCategorys,
-        },
-      }),
-    [dispatch, localmyCategorys],
-  );
+  const onSubmit = useCallback(() => {
+    dispatch({
+      type: 'category/toggle',
+      payload: {
+        myCategorys: localmyCategorys,
+      },
+    });
+    if (isEdit) {
+      navigation.goBack();
+    }
+  }, [dispatch, isEdit, localmyCategorys, navigation]);
 
   const classifyGroup = _.groupBy(categorys, (item) => {
     item.classify;
@@ -78,23 +80,26 @@ const Category: React.FC<Iprops> = ({
     });
   };
 
-  const onPress = (item: ICategory, index: number, selected: boolean) => {
-    const disabled = fixedItems.indexOf(index) > -1;
-    if (disabled) {
-      return;
-    }
-    if (isEdit) {
-      if (selected) {
-        setLocalmyCategorys((prev) => {
-          return prev.filter((selectedItem) => selectedItem.id !== item.id);
-        });
-      } else {
-        setLocalmyCategorys((prev) => {
-          return prev.concat([item]);
-        });
+  const onPress = useCallback(
+    (item: ICategory, index: number, selected: boolean) => {
+      const disabled = fixedItems.indexOf(index) > -1;
+      if (disabled) {
+        return;
       }
-    }
-  };
+      if (isEdit) {
+        if (selected) {
+          setLocalmyCategorys((prev) => {
+            return prev.filter((selectedItem) => selectedItem.id !== item.id);
+          });
+        } else {
+          setLocalmyCategorys((prev) => {
+            return prev.concat([item]);
+          });
+        }
+      }
+    },
+    [isEdit],
+  );
 
   const renderUnSelectedItem = (item: ICategory, index: number) => {
     <Touchable
@@ -108,20 +113,44 @@ const Category: React.FC<Iprops> = ({
   const renderItem = (item: ICategory, index: number) => {
     const disabled = fixedItems.indexOf(index) > -1;
     return (
-      <Touchable
+      <Item
         key={item.id}
-        onPress={() => onPress(item, index, true)}
-        onLongPress={onLongPress}>
-        <Item data={item} isEdit={isEdit} selected disabled={disabled} />;
-      </Touchable>
+        data={item}
+        isEdit={isEdit}
+        selected
+        disabled={disabled}
+      />
     );
   };
+
+  const onDataChange = useCallback((data: ICategory[]) => {
+    setLocalmyCategorys(data);
+  }, []);
+
+  const onClickItem = useCallback(
+    (data: ICategory[], item: ICategory) => {
+      onPress(item, data.indexOf(item), true);
+    },
+    [onPress],
+  );
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.classifyName}>我的分类</Text>
       <View style={styles.classifyView}>
-        {localmyCategorys.map(renderItem)}
+        <DragSortableView
+          dataSource={localmyCategorys}
+          fixedItems={fixedItems}
+          renderItem={renderItem}
+          sortable={isEdit}
+          keyExtractor={(item) => item.id}
+          onDataChange={onDataChange}
+          parentWidth={parentWidth}
+          childrenWidth={itemWidth}
+          childrenHeight={itemHeight}
+          marginChildrenTop={margin}
+          onClickItem={onClickItem}
+        />
       </View>
       <View>
         {Object.keys(classifyGroup).map((classify) => {
