@@ -1,5 +1,5 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import {
   CardStyleInterpolators,
   createStackNavigator,
@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/stack';
 import BottomTabs from './BottomTabs';
 import Detail from '@/pages/Detail';
-import {Platform, StatusBar, StyleSheet} from 'react-native';
+import { Platform, StatusBar, StyleSheet } from 'react-native';
 import Category from '@/pages/category';
 
 export type RootStackParamList = {
@@ -37,7 +37,13 @@ const Navigator: React.FC = () => {
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // 跳转页面卡片加载方向为从右向左
           gestureEnabled: true, // 手势
           gestureDirection: 'horizontal', // 手势为水平方向
-          headerStatusBarHeight: StatusBar.currentHeight, // 状态栏高度
+          ...Platform.select({
+            android: {
+              headerStatusBarHeight: StatusBar.currentHeight, // 状态栏高度
+            },
+          }),
+          headerBackTitleVisible: false, // 不显示返回标题
+          headerTintColor: '#333',
           // 安卓上没有阴影，只有投影，即不能改变光源
           headerStyle: {
             ...Platform.select({
@@ -64,7 +70,7 @@ const Navigator: React.FC = () => {
           }}
         />
         <Stack.Screen
-          options={{headerTitle: '详情页'}}
+          options={{ headerTitle: '详情页' }}
           name="Detail"
           component={Detail}
         />

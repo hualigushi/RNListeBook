@@ -1,12 +1,14 @@
 import {ICategory} from '@/models/category';
 import {RootState} from '@/models/index';
 
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import _ from 'lodash';
 import {ScrollView} from 'react-native-gesture-handler';
 import Item from './Item';
+import {RootStackNavigation} from '@/navigator/';
+import HeaderRightBtn from './HeaderrightBtn';
 
 const mapStateToProps = ({category}: RootState) => {
   return {
@@ -19,9 +21,28 @@ const connector = connect(mapStateToProps);
 
 type ModelState = ConnectedProps<typeof connector>;
 
-interface Iprops extends ModelState {}
+interface Iprops extends ModelState {
+  navigation: RootStackNavigation;
+}
 
-const Category: React.FC<Iprops> = ({myCategorys, categorys}) => {
+const Category: React.FC<Iprops> = ({
+  dispatch,
+  myCategorys,
+  categorys,
+  navigation,
+}) => {
+  const onSubmit = useCallback(
+    () =>
+      dispatch({
+        type: 'category/toggle',
+      }),
+    [dispatch],
+  );
+
+  navigation.setOptions({
+    headerRight: () => <HeaderRightBtn onSubmit={onSubmit} />,
+  });
+
   const [localmyCategorys, setLocalmyCategorys] = useState<ICategory[]>(
     myCategorys,
   );

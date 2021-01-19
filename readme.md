@@ -233,3 +233,6 @@ export default Detail;
 
 ## 处理数据结构
 `npm install lodash @types/lodash -S`
+
+## 按钮库
+`npm install react-navigation-header-buttons -S`

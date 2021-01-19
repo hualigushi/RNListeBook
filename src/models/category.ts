@@ -1,3 +1,4 @@
+import {RootState} from './index';
 import storage, {load} from '@/config/storage';
 import axios from 'axios';
 import {Effect, Model, SubscriptionsMapObject} from 'dva-core-ts';
@@ -11,6 +12,7 @@ export interface ICategory {
   classify?: string;
 }
 interface CategoryModelState {
+  isEdit: boolean;
   myCategorys: ICategory[];
   categorys: ICategory[];
 }
@@ -20,6 +22,7 @@ interface CategoryModel extends Model {
   state: CategoryModelState;
   effects: {
     loadData: Effect;
+    toggele: Effect;
   };
   reducers: {
     setState: Reducer<CategoryModelState>;
@@ -28,6 +31,7 @@ interface CategoryModel extends Model {
 }
 
 const initialState: CategoryModelState = {
+  isEdit: false,
   myCategorys: [
     {
       id: 'home',
@@ -66,6 +70,15 @@ const categoryModel: CategoryModel = {
           },
         });
       }
+    },
+    *toggele({payload}, {put, select}) {
+      const category = yield select(({category}: RootState) => category);
+      yield put({
+        type: 'setState',
+        payload: {
+          isEdit: !category.isEdit,
+        },
+      });
     },
   },
   reducers: {
