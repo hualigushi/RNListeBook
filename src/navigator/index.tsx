@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
   createStackNavigator,
@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/stack';
 import BottomTabs from './BottomTabs';
 import Detail from '@/pages/Detail';
-import { Platform, StatusBar, StyleSheet } from 'react-native';
+import {Platform, StatusBar, StyleSheet} from 'react-native';
 import Category from '@/pages/category';
 
 export type RootStackParamList = {
@@ -70,7 +70,7 @@ const Navigator: React.FC = () => {
           }}
         />
         <Stack.Screen
-          options={{ headerTitle: '详情页' }}
+          options={{headerTitle: '详情页'}}
           name="Detail"
           component={Detail}
         />

@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {ScrollView} from 'react-native-gesture-handler';
 import Item, {itemHeight, itemWidth, margin, parentWidth} from './Item';
 import {RootStackNavigation} from '@/navigator/index';
-import HeaderRightBtn from './HeaderrightBtn';
+import HeaderRightBtn from './HeaderRightBtn';
 import Touchable from '@/components/Touchable';
 import {DragSortableView} from 'react-native-drag-sort';
 
@@ -38,22 +38,6 @@ const Category: React.FC<Iprops> = ({
     myCategorys,
   );
 
-  navigation.setOptions({
-    headerRight: () => <HeaderRightBtn onSubmit={onSubmit} />,
-  });
-
-  useEffect(() => {
-    return () => {
-      // 退出时退出编辑状态
-      dispatch({
-        type: 'category/toggle',
-        payload: {
-          isEdit: false,
-        },
-      });
-    };
-  }, [dispatch]);
-
   const onSubmit = useCallback(() => {
     dispatch({
       type: 'category/toggle',
@@ -66,8 +50,28 @@ const Category: React.FC<Iprops> = ({
     }
   }, [dispatch, isEdit, localmyCategorys, navigation]);
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <HeaderRightBtn onSubmit={onSubmit} />,
+    });
+  }, [navigation, onSubmit]);
+
+  useEffect(() => {
+    navigation.addListener('beforeRemove', (e) => {
+      e.preventDefault();
+      // 退出时退出编辑状态
+      dispatch({
+        type: 'category/setState',
+        payload: {
+          isEdit: false,
+        },
+      });
+      navigation.dispatch(e.data.action);
+    });
+  }, [dispatch, navigation]);
+
   const classifyGroup = _.groupBy(categorys, (item) => {
-    item.classify;
+    return item.classify;
   });
 
   // 长按进入编辑
@@ -88,26 +92,28 @@ const Category: React.FC<Iprops> = ({
       }
       if (isEdit) {
         if (selected) {
-          setLocalmyCategorys((prev) => {
-            return prev.filter((selectedItem) => selectedItem.id !== item.id);
-          });
+          const newList = localmyCategorys.filter(
+            (selectedItem) => selectedItem.id !== item.id,
+          );
+          setLocalmyCategorys(newList);
         } else {
-          setLocalmyCategorys((prev) => {
-            return prev.concat([item]);
-          });
+          const newList = localmyCategorys.concat([item]);
+          setLocalmyCategorys(newList);
         }
       }
     },
-    [isEdit],
+    [isEdit, localmyCategorys],
   );
 
   const renderUnSelectedItem = (item: ICategory, index: number) => {
-    <Touchable
-      key={item.id}
-      onPress={() => onPress(item, index, false)}
-      onLongPress={onLongPress}>
-      <Item data={item} isEdit={isEdit} selected={false} />;
-    </Touchable>;
+    return (
+      <Touchable
+        key={item.id}
+        onPress={() => onPress(item, index, false)}
+        onLongPress={onLongPress}>
+        <Item data={item} isEdit={isEdit} selected={false} />
+      </Touchable>
+    );
   };
 
   const renderItem = (item: ICategory, index: number) => {
@@ -176,10 +182,11 @@ const Category: React.FC<Iprops> = ({
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'f3f6f6',
+    backgroundColor: '#f3f6f6',
   },
   classifyName: {
     fontSize: 16,
