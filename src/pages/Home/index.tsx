@@ -16,14 +16,24 @@ import {IChannel} from '@/models/home';
 import ChannelItem from './ChannelItem';
 import {Text} from 'react-native';
 import {NativeSyntheticEvent} from 'react-native';
+import {HomeParamsList} from '@/navigator/HomeTabs';
+import {RouteProp} from '@react-navigation/native';
 
-const mapStateToProps = ({home, loading}: RootState) => ({
-  carousels: home.carousels,
-  channels: home.channels,
-  hasMore: home.pagination.hasMore,
-  gradientVisible: home.gradientVisible,
-  loading: loading.effects['home/fetchCarousels'],
-});
+const mapStateToProps = (
+  state: RootState,
+  {route}: {route: RouteProp<HomeParamsList, string>},
+) => {
+  const {namespace} = route.params;
+  const modelState = state[namespace];
+  return {
+    namespace,
+    carousels: modelState.carousels,
+    channels: modelState.channels,
+    hasMore: modelState.pagination.hasMore,
+    gradientVisible: modelState.gradientVisible,
+    loading: state.loading.effects[namespace + '/fetchCarousels'],
+  };
+};
 const connector = connect(mapStateToProps);
 type ModelState = ConnectedProps<typeof connector>;
 interface Iprops extends ModelState {
@@ -31,6 +41,7 @@ interface Iprops extends ModelState {
 }
 
 const Home: React.FC<Iprops> = ({
+  namespace,
   dispatch,
   channels,
   loading,
@@ -41,12 +52,12 @@ const Home: React.FC<Iprops> = ({
 
   useEffect(() => {
     dispatch({
-      type: 'home/fetchCarousels',
+      type: namespace + '/fetchCarousels',
     });
     dispatch({
-      type: 'home/fetchChannels',
+      type: namespace + '/fetchChannels',
     });
-  }, [dispatch]);
+  }, [dispatch, namespace]);
 
   const onPress = (data: IChannel) => {
     console.log(data);
@@ -55,12 +66,12 @@ const Home: React.FC<Iprops> = ({
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     dispatch({
-      type: 'home/fetchChannels',
+      type: namespace + '/fetchChannels',
       callback: () => {
         setRefreshing(false);
       },
     });
-  }, [dispatch]);
+  }, [dispatch, namespace]);
 
   // 加载更多
   const onEndReached = () => {
@@ -68,7 +79,7 @@ const Home: React.FC<Iprops> = ({
       return;
     }
     dispatch({
-      type: 'home/fetchChannels',
+      type: namespace + '/fetchChannels',
       payload: {
         loadMore: true,
       },
@@ -85,7 +96,7 @@ const Home: React.FC<Iprops> = ({
     let newGradientVisible = offsetY < sideHeight;
     if (gradientVisible !== newGradientVisible) {
       dispatch({
-        type: 'home/setState',
+        type: namespace + '/setState',
         payload: {
           gradientVisible: newGradientVisible,
         },
@@ -103,7 +114,7 @@ const Home: React.FC<Iprops> = ({
         <Carousel />
         {/* 往上滚动时，猜你喜欢覆盖渐变色效果 */}
         <View style={styles.background}>
-          <Guess />
+          <Guess namespace={namespace} />
         </View>
       </View>
     );

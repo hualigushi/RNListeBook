@@ -7,12 +7,51 @@ import {
 import Home from '@/pages/Home';
 import TopBarBarWrapper from '@/pages/views/TopBarBarWrapper';
 import {StyleSheet} from 'react-native';
+import {RootState} from '../models';
+import {connect, ConnectedProps} from 'react-redux';
+import {ICategory} from '@/models/category';
+import {createHomeModel} from '@/config/dva';
 
-const Tab = createMaterialTopTabNavigator();
+export type HomeParamsList = {
+  [key: string]: {
+    namespace: string;
+  };
+};
 
-const HomeTabs: React.FC = () => {
+const Tab = createMaterialTopTabNavigator<HomeParamsList>();
+
+const mapStateToProps = ({category}: RootState) => {
+  return {
+    myCategorys: category.myCategorys,
+  };
+};
+
+const connector = connect(mapStateToProps);
+
+type ModelState = ConnectedProps<typeof connector>;
+
+interface IProps extends ModelState {}
+
+const HomeTabs: React.FC<IProps> = ({myCategorys}) => {
   const tabBar = (props: MaterialTopTabBarProps) => {
     return <TopBarBarWrapper {...props} />;
+  };
+
+  const renderScreen = (item: ICategory) => {
+    createHomeModel(item.id);
+    return (
+      <Tab.Screen
+        key={item.id}
+        name={item.id}
+        component={Home}
+        options={{
+          tabBarLabel: item.name,
+        }}
+        initialParams={{
+          namespace: item.id,
+        }}
+      />
+    );
   };
   return (
     <Tab.Navigator
@@ -34,13 +73,14 @@ const HomeTabs: React.FC = () => {
         activeTintColor: '#f86442',
         inactiveTintColor: '#333',
       }}>
-      <Tab.Screen
+      {myCategorys.map(renderScreen)}
+      {/* <Tab.Screen
         name="Home"
         component={Home}
         options={{
           tabBarLabel: '推荐',
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };
@@ -49,4 +89,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent', // 背景色透明，渐变色才生效
   },
 });
-export default HomeTabs;
+export default connector(HomeTabs);

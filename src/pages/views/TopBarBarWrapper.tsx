@@ -10,15 +10,18 @@ import LinearAnimatedGradientTransition from 'react-native-linear-animated-gradi
 import {Text} from 'react-native';
 import {RootState} from '@/models/index';
 import {connect, ConnectedProps} from 'react-redux';
+import {getActiveRouteName} from '@/utils/index';
 
-const mapStateToProps = ({home}: RootState) => {
+const mapStateToProps = (state: RootState, props: MaterialTopTabBarProps) => {
+  const routeName = getActiveRouteName(props.state);
+  const modelState = state[routeName];
   return {
-    gradientVisible: home.gradientVisible,
+    gradientVisible: modelState.gradientVisible,
 
     linearColors:
-      home.carousels && home.carousels.length > 0
-        ? home.carousels[home.activeCarouselIndex]
-          ? home.carousels[home.activeCarouselIndex].colors
+    modelState.carousels && modelState.carousels.length > 0
+        ? modelState.carousels[modelState.activeCarouselIndex]
+          ? modelState.carousels[modelState.activeCarouselIndex].colors
           : undefined
         : undefined,
   };
@@ -76,6 +79,7 @@ const TopBarBarWrapper: React.FC<IProps> = ({
         {getLinearGradient()}
         <MaterialTopTabBar
           {...props}
+          navigation={navigation}
           activeTintColor={activeTintColor} // activeTintColor放在prop后面，否则被覆盖
           indicatorStyle={newIndicatorStyle}
           style={styles.tabbar}

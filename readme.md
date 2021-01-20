@@ -239,3 +239,8 @@ export default Detail;
 
 ## 拖拽
 `npm install react-native-drag-sort -S`
+
+## 动态生成dva model
+`npm install dva-model-extend -S`
+
+## 根目录创建 index.d.ts 类型声明dva-model-extend文件

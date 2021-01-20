@@ -14,12 +14,15 @@ const mapStateToProps = ({home}: RootState) => {
 };
 const connector = connect(mapStateToProps);
 type ModelState = ConnectedProps<typeof connector>;
-const Guess: React.FC<ModelState> = ({dispatch, guess}) => {
+interface IProps extends ModelState {
+  namespace: string;
+}
+const Guess: React.FC<IProps> = ({dispatch, guess, namespace}) => {
   const fetch = useCallback(() => {
     dispatch({
-      type: 'home/fetchGuess',
+      type: namespace + '/fetchGuess',
     });
-  }, [dispatch]);
+  }, [dispatch, namespace]);
 
   useEffect(() => {
     fetch();
