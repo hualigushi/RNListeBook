@@ -61,7 +61,7 @@ const TopBarBarWrapper: React.FC<IProps> = ({
 
   // 渐变色显示时，搜索菜单显示为白色
   const activeTintColor = useMemo(() => {
-    return gradientVisible ? '#ccc' : ' #fff';
+    return gradientVisible ? '#fff' : '#333';
   }, [gradientVisible]);
 
   const newIndicatorStyle = useMemo(() => {

@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
+  FlatList,
   ListRenderItemInfo,
   NativeScrollEvent,
   StyleSheet,
@@ -11,7 +12,6 @@ import {RootStackNavigation} from '@/navigator/index';
 import Carousel, {sideHeight} from './Carousel';
 import {useEffect} from 'react';
 import Guess from './Guess';
-import {FlatList} from 'react-native-gesture-handler';
 import {IChannel} from '@/models/home';
 import ChannelItem from './ChannelItem';
 import {Text} from 'react-native';
@@ -52,7 +52,7 @@ const Home: React.FC<Iprops> = ({
     console.log(data);
   };
 
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     dispatch({
       type: 'home/fetchChannels',
@@ -60,7 +60,7 @@ const Home: React.FC<Iprops> = ({
         setRefreshing(false);
       },
     });
-  };
+  }, [dispatch]);
 
   // 加载更多
   const onEndReached = () => {
@@ -87,7 +87,7 @@ const Home: React.FC<Iprops> = ({
       dispatch({
         type: 'home/setState',
         payload: {
-          gradientVisible,
+          gradientVisible: newGradientVisible,
         },
       });
     }
