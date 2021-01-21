@@ -12,7 +12,7 @@ import {RootStackNavigation} from '@/navigator/index';
 import Carousel, {sideHeight} from './Carousel';
 import {useEffect} from 'react';
 import Guess from './Guess';
-import {IChannel} from '@/models/home';
+import {IChannel, IGuess} from '@/models/home';
 import ChannelItem from './ChannelItem';
 import {Text} from 'react-native';
 import {NativeSyntheticEvent} from 'react-native';
@@ -47,6 +47,7 @@ const Home: React.FC<Iprops> = ({
   loading,
   hasMore,
   gradientVisible,
+  navigation,
 }) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
@@ -59,8 +60,8 @@ const Home: React.FC<Iprops> = ({
     });
   }, [dispatch, namespace]);
 
-  const onPress = (data: IChannel) => {
-    console.log(data);
+  const goAlbum = (data: IChannel | IGuess) => {
+    navigation.navigate('Album',{item: data});
   };
 
   const onRefresh = useCallback(() => {
@@ -87,7 +88,7 @@ const Home: React.FC<Iprops> = ({
   };
 
   const renderItem = ({item}: ListRenderItemInfo<IChannel>) => {
-    return <ChannelItem data={item} onPress={onPress} />;
+    return <ChannelItem data={item} onPress={goAlbum} />;
   };
 
   // 页面往下滚动时，判断滚动距离是否超过轮播图高度，是则隐藏渐变色
@@ -114,7 +115,7 @@ const Home: React.FC<Iprops> = ({
         <Carousel />
         {/* 往上滚动时，猜你喜欢覆盖渐变色效果 */}
         <View style={styles.background}>
-          <Guess namespace={namespace} />
+          <Guess namespace={namespace} goAlbum={goAlbum}/>
         </View>
       </View>
     );

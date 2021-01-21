@@ -244,3 +244,9 @@ export default Detail;
 `npm install dva-model-extend -S`
 
 ## 根目录创建 index.d.ts 类型声明dva-model-extend文件
+
+## 导入png图片需要在index.d.ts中声明类型
+`declare module '*.png';`
+
+## 频道组件标题背景透明模糊效果
+`npm install @react-native-community/blur -S`

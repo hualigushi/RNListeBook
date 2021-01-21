@@ -1,5 +1,5 @@
 import Touchable from '@/components/Touchable';
-import {IGUESS} from '@/models/home';
+import {IGuess} from '@/models/home';
 import {RootState} from '@/models/index';
 import React, {useCallback, useEffect} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
@@ -16,8 +16,9 @@ const connector = connect(mapStateToProps);
 type ModelState = ConnectedProps<typeof connector>;
 interface IProps extends ModelState {
   namespace: string;
+  goAlbum: (item: IGuess) => void;
 }
-const Guess: React.FC<IProps> = ({dispatch, guess, namespace}) => {
+const Guess: React.FC<IProps> = ({dispatch, goAlbum, guess, namespace}) => {
   const fetch = useCallback(() => {
     dispatch({
       type: namespace + '/fetchGuess',
@@ -28,16 +29,20 @@ const Guess: React.FC<IProps> = ({dispatch, guess, namespace}) => {
     fetch();
   }, [fetch]);
 
-  const renderItem = ({item}: {item: IGUESS}) => {
+  const renderItem = ({item}: {item: IGuess}) => {
     return (
-      <Touchable style={styles.item}>
+      <Touchable
+        style={styles.item}
+        onPress={() => {
+          goAlbum(item);
+        }}>
         <Image source={{uri: item.image}} style={styles.image} />
         <Text numberOfLines={2}>{item.title}</Text>
       </Touchable>
     );
   };
 
-  const keyExtractor = (item: IGUESS) => {
+  const keyExtractor = (item: IGuess) => {
     return item.id;
   };
 

@@ -1,5 +1,5 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useCallback} from 'react';
+import {NavigationContainer, RouteProp} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
   createStackNavigator,
@@ -9,22 +9,52 @@ import {
 import BottomTabs from './BottomTabs';
 import Detail from '@/pages/Detail';
 import {Platform, StatusBar, StyleSheet} from 'react-native';
-import Category from '@/pages/category';
+import Category from '@/pages/Category';
+import Album from '@/pages/Album';
+import Animated from 'react-native-reanimated';
 
 export type RootStackParamList = {
   BottomTabs: {
     screen: string;
   };
   Category: undefined;
-  Detail: {
-    // 导航传参
-    id: number;
+  Album: {
+    item: {
+      id: string;
+      title: string;
+      image: string;
+    };
   };
 };
 
 export type RootStackNavigation = StackNavigationProp<RootStackParamList>;
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+const getAlbumOptions = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, 'Album'>;
+}) => {
+  return {
+    headerTitle: route.params.item.title,
+    headerTransparent: true, // 标题栏透明
+    headerTitleStyle: {
+      // 头部标题样式
+      opacity: 0,
+    },
+    headerBackground: () => {
+      return <Animated.View style={styles.headerBackground} />;
+    },
+  };
+};
+const styles = StyleSheet.create({
+  headerBackground:{
+    flex: 1,
+    backgroundColor: '#fff',
+    opacity: 0,
+  }
+});
 const Navigator: React.FC = () => {
   return (
     // 堆栈导航器嵌套标签导航器
@@ -70,9 +100,9 @@ const Navigator: React.FC = () => {
           }}
         />
         <Stack.Screen
-          options={{headerTitle: '详情页'}}
-          name="Detail"
-          component={Detail}
+          options={getAlbumOptions}
+          name="Album"
+          component={Album}
         />
       </Stack.Navigator>
     </NavigationContainer>

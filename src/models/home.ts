@@ -14,7 +14,7 @@ export interface ICarousel {
   image: string;
   colors: [string, string];
 }
-export interface IGUESS {
+export interface IGuess {
   id: string;
   title: string;
   image: string;
