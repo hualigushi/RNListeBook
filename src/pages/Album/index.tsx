@@ -7,6 +7,7 @@ import {RootStackParamList} from '@/navigator/index';
 import {RouteProp} from '@react-navigation/native';
 import CorverRight from '@/assets/cover-right.png';
 import {BlurView} from '@react-native-community/blur';
+import Tab from './Tab';
 
 const mapStateToProps = ({album}: RootState) => {
   return {
@@ -67,9 +68,17 @@ const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
     );
   };
 
-  return <View>{renderHeader()}</View>;
+  return (
+  <View style={styles.container}>
+      {renderHeader()}
+    <Tab/>      
+</View>
+  );
 };
 const styles = StyleSheet.create({
+    container:{
+        flex:1,
+    },
   header: {
     height: 260,
     flexDirection: 'row',
