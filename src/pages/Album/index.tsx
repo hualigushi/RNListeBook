@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, Text, View, Image, Animated} from 'react-native';
 import {useHeaderHeight} from '@react-navigation/stack';
 import {RootState} from '@/models/index';
 import {connect, ConnectedProps} from 'react-redux';
@@ -26,17 +26,23 @@ interface IProps extends ModelState {
 
 const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
   const headerHeight = useHeaderHeight();
+  const translateY = new Animated.Value(0);
 
   useEffect(() => {
     const {id} = route.params.item;
-    console.log('useEffect ~ id', id);
     dispatch({
       type: 'album/fetchAlbum',
       payload: {
         id,
       },
     });
-  }, [dispatch, route.params.item]);
+    // 时间函数：作用是推动一个值按照缓动曲线随着时间变化
+    Animated.timing(translateY, {
+      toValue: -170,
+      duration: 3000, // 在3秒将translateY有0改为-170
+      useNativeDriver: true,
+    }).start();
+  }, [dispatch, route.params.item, translateY]);
 
   const renderHeader = () => {
     const {title, image} = route.params.item;
@@ -69,16 +75,30 @@ const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
   };
 
   return (
-  <View style={styles.container}>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          opacity: translateY.interpolate({
+            inputRange: [-170, 0],
+            outputRange: [1, 0],
+          }),
+          backgroundColor: translateY.interpolate({
+            inputRange: [-170, 0],
+            outputRange: ['red', '#fff'],
+          }),
+          transform: [{translateY: translateY}],
+        },
+      ]}>
       {renderHeader()}
-    <Tab/>      
-</View>
+      <Tab />
+    </Animated.View>
   );
 };
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-    },
+  container: {
+    flex: 1,
+  },
   header: {
     height: 260,
     flexDirection: 'row',
