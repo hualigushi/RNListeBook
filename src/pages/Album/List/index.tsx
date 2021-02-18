@@ -29,7 +29,6 @@ const List: React.FC<IProps> = ({
 }) => {
   const onPress = useCallback(
     (data: IProgram, index: number) => {
-      console.log('onPress ~ data', data);
       onItemPress(data, index);
     },
     [onItemPress],

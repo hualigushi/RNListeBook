@@ -155,11 +155,11 @@ const Album: React.FC<IProps> = ({
 
   const onItemPress = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (item: IProgram, index: number) => {
+    (data: IProgram, index: number) => {
       // const previousItem: IProgram = data.list[index - 1];
       // const nextItem: IProgram = data.list[index + 1];
       let params = {
-        id: item.id,
+        id: data.id,
       };
       // dispatch({
       //   type: 'player/setState',
@@ -186,7 +186,7 @@ const Album: React.FC<IProps> = ({
         <Image source={{uri: image}} style={styles.background} />
         <BlurView
           blurType="light"
-          blurAmount={5}
+          blurAmount={10}
           style={StyleSheet.absoluteFillObject}
         />
         <View style={styles.leftView}>
