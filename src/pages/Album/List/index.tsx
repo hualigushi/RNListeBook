@@ -19,7 +19,10 @@ type ModelState = ConnectedProps<typeof connector>;
 interface IProps extends ModelState {}
 
 const List: React.FC<IProps> = ({list}) => {
-  const onPress = useCallback((data: IProgram) => {}, []);
+  const onPress = useCallback((data: IProgram) => {
+    console.log('onPress ~ data', data);
+  }, []);
+
   const renderItem = useCallback(
     ({item, index}: ListRenderItemInfo<IProgram>) => {
       return <Item data={item} index={index} onPress={onPress} />;
