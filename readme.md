@@ -255,3 +255,9 @@ export default Detail;
 react native是有手势响应系统的，比如View组件就有一系列的函数用来响应用户的手势操作，但是这个系统是在js线程上的。但是react native中又有一些组件是使用原生组件渲染的，比如ScrollView,这就导致View组件的函数无法阻止原生组件的一些响应，比如想在ScrollView中创建一个不滚动的区域，这是做不到的，而且运行在js线程上，性能也较差一些
 
 社区更好用的手势响应库 react-native-gesture-handler
+
+## 播放声音
+`npm install react-native-sound -S`
+
+## 声音进度条
+`npm install react-native-slider-x -S`

@@ -29,8 +29,6 @@ const play = () => {
           console.log('playback failed due to audio decoding errors');
           reject();
         }
-        // 释放资源
-        sound.release();
       });
     } else {
       reject();
