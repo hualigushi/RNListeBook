@@ -1,10 +1,11 @@
 import {RootState} from '@/models/index';
 import {IProgram} from '@/models/album';
 import React, {useCallback} from 'react';
-import {ListRenderItemInfo, StyleSheet} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import {Animated, ListRenderItemInfo, StyleSheet} from 'react-native';
+import {NativeViewGestureHandler} from 'react-native-gesture-handler';
 import {connect, ConnectedProps} from 'react-redux';
 import Item from './Item';
+import {ITabProps} from '../Tab';
 
 const mapStateToProps = ({album}: RootState) => {
   return {
@@ -14,14 +15,25 @@ const mapStateToProps = ({album}: RootState) => {
 
 const connector = connect(mapStateToProps);
 
-type ModelState = ConnectedProps<typeof connector>;
+type ModalState = ConnectedProps<typeof connector>;
 
-interface IProps extends ModelState {}
+type IProps = ModalState & ITabProps;
 
-const List: React.FC<IProps> = ({list}) => {
-  const onPress = useCallback((data: IProgram) => {
-    console.log('onPress ~ data', data);
-  }, []);
+const List: React.FC<IProps> = ({
+  list,
+  panRef,
+  tapRef,
+  nativeRef,
+  onScrollDrag,
+  onItemPress,
+}) => {
+  const onPress = useCallback(
+    (data: IProgram, index: number) => {
+      console.log('onPress ~ data', data);
+      onItemPress(data, index);
+    },
+    [onItemPress],
+  );
 
   const renderItem = useCallback(
     ({item, index}: ListRenderItemInfo<IProgram>) => {
@@ -34,12 +46,20 @@ const List: React.FC<IProps> = ({list}) => {
     return item.id;
   };
   return (
-    <FlatList
-      style={styles.container}
-      data={list}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-    />
+    <NativeViewGestureHandler
+      simultaneousHandlers={panRef}
+      ref={nativeRef}
+      waitFor={tapRef}>
+      <Animated.FlatList
+        style={styles.container}
+        data={list}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        bounces={false}
+        scrollEventThrottle={1}
+        onScrollBeginDrag={onScrollDrag}
+      />
+    </NativeViewGestureHandler>
   );
 };
 

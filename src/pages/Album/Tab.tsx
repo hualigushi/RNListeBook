@@ -1,5 +1,16 @@
+import {IProgram} from '@/models/album';
 import React, {useCallback, useState} from 'react';
-import {Platform, StyleSheet} from 'react-native';
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Platform,
+  StyleSheet,
+} from 'react-native';
+import {
+  NativeViewGestureHandler,
+  PanGestureHandler,
+  TapGestureHandler,
+} from 'react-native-gesture-handler';
 import {SceneRendererProps, TabBar, TabView} from 'react-native-tab-view';
 import Introdution from './Introdution';
 import List from './List';
@@ -13,24 +24,51 @@ interface IState {
   routes: IRoute[];
 }
 
-const Tab: React.FC = () => {
+export interface ITabProps {
+  panRef: React.RefObject<PanGestureHandler>;
+  tapRef: React.RefObject<TapGestureHandler>;
+  nativeRef: React.RefObject<NativeViewGestureHandler>;
+  onScrollDrag: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onItemPress: (data: IProgram, index: number) => void;
+}
+
+const Tab: React.FC<ITabProps> = ({
+  panRef,
+  tapRef,
+  nativeRef,
+  onScrollDrag,
+  onItemPress,
+}) => {
   const [index, setIndex] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [routes, setRoutes] = useState<IRoute[]>([
     {key: 'introdution', title: '简介'},
     {key: 'albums', title: '节目'},
   ]);
-  const onIndexChange = useCallback((index: number) => {
-    setIndex(index);
+
+  const onIndexChange = useCallback((i: number) => {
+    setIndex(i);
   }, []);
 
-  const renderScene = useCallback(({route}: {route: IRoute}) => {
-    switch (route.key) {
-      case 'introdution':
-        return <Introdution />;
-      case 'albums':
-        return <List />;
-    }
-  }, []);
+  const renderScene = useCallback(
+    ({route}: {route: IRoute}) => {
+      switch (route.key) {
+        case 'introdution':
+          return <Introdution />;
+        case 'albums':
+          return (
+            <List
+              panRef={panRef}
+              tapRef={tapRef}
+              nativeRef={nativeRef}
+              onScrollDrag={onScrollDrag}
+              onItemPress={onItemPress}
+            />
+          );
+      }
+    },
+    [nativeRef, onItemPress, onScrollDrag, panRef, tapRef],
+  );
 
   const renderTabBar = useCallback(
     (props: SceneRendererProps & {navigationState: IState}) => {

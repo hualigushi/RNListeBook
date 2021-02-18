@@ -5,12 +5,14 @@ import {
   createStackNavigator,
   HeaderStyleInterpolators,
   StackNavigationProp,
+  TransitionPresets,
 } from '@react-navigation/stack';
 import BottomTabs from './BottomTabs';
 import {Animated, Platform, StatusBar, StyleSheet} from 'react-native';
 import Category from '@/pages/Category';
 import Album from '@/pages/Album';
 import Detail from '@/pages/Detail';
+import Icon from '@/assets/iconfont';
 
 export type RootStackParamList = {
   BottomTabs: {
@@ -60,6 +62,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     opacity: 0,
+  },
+  headerBackImage: {
+    marginHorizontal: Platform.OS === 'android' ? 0 : 8,
   },
 });
 
@@ -112,7 +117,9 @@ const RootStackScreen = () => {
 
 export type ModalStackParamList = {
   Root: undefined;
-  Detail: undefined;
+  Detail: {
+    id: string;
+  };
 };
 
 const ModalStack = createStackNavigator<ModalStackParamList>();
@@ -122,7 +129,15 @@ export type ModalStackNavigation = StackNavigationProp<ModalStackParamList>;
 // 嵌套ModalStack目的是让频道详情以全屏模式展示
 const ModalStackScreen = () => {
   return (
-    <ModalStack.Navigator mode="modal" headerMode="screen">
+    <ModalStack.Navigator
+      mode="modal"
+      headerMode="screen"
+      screenOptions={{
+        headerTitleAlign: 'center',
+        gestureEnabled: true,
+        ...TransitionPresets.ModalPresentationIOS,
+        headerBackTitleVisible: false,
+      }}>
       <ModalStack.Screen
         name="Root"
         component={RootStackScreen}
@@ -130,7 +145,26 @@ const ModalStackScreen = () => {
           headerShown: false,
         }}
       />
-      <ModalStack.Screen name="Detail" component={Detail} />
+      <ModalStack.Screen
+        name="Detail"
+        component={Detail}
+        options={{
+          headerTintColor: '#fff',
+          headerTitle: '',
+          headerTransparent: true,
+          cardStyle: {
+            backgroundColor: '#807c66',
+          },
+          headerBackImage: ({tintColor}) => (
+            <Icon
+              name="icon-down"
+              size={30}
+              color={tintColor}
+              style={styles.headerBackImage}
+            />
+          ),
+        }}
+      />
     </ModalStack.Navigator>
   );
 };

@@ -3,17 +3,20 @@ import {StyleSheet, Text, View, Image, Animated} from 'react-native';
 import {useHeaderHeight} from '@react-navigation/stack';
 import {RootState} from '@/models/index';
 import {connect, ConnectedProps} from 'react-redux';
-import {RootStackParamList} from '@/navigator/index';
+import {ModalStackNavigation, RootStackParamList} from '@/navigator/index';
 import {RouteProp} from '@react-navigation/native';
 import CorverRight from '@/assets/cover-right.png';
 import {BlurView} from '@react-native-community/blur';
 import Tab from './Tab';
 import {
+  NativeViewGestureHandler,
   PanGestureHandler,
   PanGestureHandlerStateChangeEvent,
   State,
+  TapGestureHandler,
 } from 'react-native-gesture-handler';
 import {viewportHeight} from '@/utils/index';
+import {IProgram} from '@/models/album';
 
 const mapStateToProps = ({album}: RootState) => {
   return {
@@ -26,20 +29,41 @@ const connector = connect(mapStateToProps);
 
 type ModelState = ConnectedProps<typeof connector>;
 interface IProps extends ModelState {
+  headerHeight: number;
+  navigation: ModalStackNavigation;
   route: RouteProp<RootStackParamList, 'Album'>;
 }
 const USE_NATIVE_DRIVER = true;
 const HEADER_HEIGHT = 260; // 频道信息头部高度
 
-const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
-  const headerHeight = useHeaderHeight();
-  const translationValue = useRef(0);
-
-  const translationYY = new Animated.Value(0);
-  const translationYOffset = new Animated.Value(0);
-  const translateY = Animated.add(translationYY, translationYOffset);
+const Album: React.FC<IProps> = ({
+  dispatch,
+  navigation,
+  route,
+  summary,
+  author,
+  headerHeight,
+}) => {
+  const tapRef = useRef<TapGestureHandler>(null);
+  const panRef = useRef<PanGestureHandler>(null);
+  const nativeRef = useRef<NativeViewGestureHandler>(null);
 
   const RANGE = [-(HEADER_HEIGHT - headerHeight), 0];
+
+  const translationYValue = useRef(0);
+  const lastScrollYValue = useRef(0);
+
+  const translationYY = new Animated.Value(0);
+  const lastScrollY = new Animated.Value(0);
+  const translationYOffset = new Animated.Value(0);
+  const reverseLastScrollY = Animated.multiply(
+    new Animated.Value(-1),
+    lastScrollY,
+  );
+  const translateY = Animated.add(
+    Animated.add(translationYY, reverseLastScrollY),
+    translationYOffset,
+  );
 
   useEffect(() => {
     const {id} = route.params.item;
@@ -55,6 +79,13 @@ const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
     //   duration: 3000, // 在3秒将translateY有0改为-170
     //   useNativeDriver: true,
     // }).start();
+    navigation.setParams({
+      opacity: translateY.interpolate({
+        inputRange: RANGE,
+        outputRange: [1, 0],
+      }),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, route.params.item]);
 
   // 在手指拖动时一直触发
@@ -66,12 +97,24 @@ const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
     },
   );
 
+  // 监听FlatList滚动
+  const onScrollDrag = Animated.event<{contentOffset: {y: number}}>(
+    [{nativeEvent: {contentOffset: {y: lastScrollY}}}],
+    {
+      useNativeDriver: USE_NATIVE_DRIVER,
+      listener: ({nativeEvent}) => {
+        lastScrollYValue.current = nativeEvent.contentOffset.y;
+      },
+    },
+  );
+
   // 手势状态发生变化时回调
   const onHandlerStateChange = useCallback(
     ({nativeEvent}: PanGestureHandlerStateChangeEvent) => {
       // 离开之前的上一次状态是活动的
       if (nativeEvent.oldState === State.ACTIVE) {
         let {translationY} = nativeEvent;
+        translationY -= lastScrollYValue.current;
         // Animated.Value
         // value
         // offset = value
@@ -80,25 +123,57 @@ const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
         translationYOffset.flattenOffset();
         // value = value + offset
         translationYY.setValue(0);
-        translationValue.current = translationValue.current + translationY;
-        if (translationValue.current < RANGE[0]) {
-          translationValue.current = RANGE[0];
+        translationYValue.current = translationYValue.current + translationY;
+        let maxDeltaY = -RANGE[0];
+        if (translationYValue.current < RANGE[0]) {
+          translationYValue.current = RANGE[0];
           Animated.timing(translationYOffset, {
             toValue: RANGE[0],
             duration: 1000,
             useNativeDriver: USE_NATIVE_DRIVER,
           }).start();
-        } else if (translationValue.current > RANGE[1]) {
-          translationValue.current = RANGE[1];
+          maxDeltaY = RANGE[1];
+        } else if (translationYValue.current > RANGE[1]) {
+          translationYValue.current = RANGE[1];
           Animated.timing(translationYOffset, {
             toValue: RANGE[1],
             duration: 1000,
             useNativeDriver: USE_NATIVE_DRIVER,
           }).start();
+          maxDeltaY = -RANGE[0];
+        }
+        if (tapRef.current) {
+          const tap: any = tapRef.current;
+          tap.setNativeProps({
+            maxDeltaY,
+          });
         }
       }
     },
     [RANGE, translationYOffset, translationYY],
+  );
+
+  const onItemPress = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (item: IProgram, index: number) => {
+      // const previousItem: IProgram = data.list[index - 1];
+      // const nextItem: IProgram = data.list[index + 1];
+      let params = {
+        id: item.id,
+      };
+      // dispatch({
+      //   type: 'player/setState',
+      //   payload: {
+      //     playList: data.list.map((item) => item.id),
+      //     currentId: item.id,
+      //     previousId: previousItem && previousItem.id,
+      //     nextId: nextItem && nextItem.id,
+      //   },
+      // });
+      navigation.navigate('Detail', params);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   const renderHeader = useMemo(() => {
@@ -135,34 +210,47 @@ const Album: React.FC<IProps> = ({dispatch, route, summary, author}) => {
   }, [author.avatar, author.name, headerHeight, route.params.item, summary]);
 
   return (
-    // PanGestureHandler 专门监听拖动手势组件，
-    // onGestureEvent 在手指触碰时会一直触发
-    <PanGestureHandler
-      onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}>
-      <Animated.View
-        style={[
-          styles.container,
-          {
-            transform: [
+    <TapGestureHandler ref={tapRef} maxDeltaY={-RANGE[0]}>
+      <View style={styles.container} pointerEvents="box-none">
+        {/* PanGestureHandler 专门监听拖动手势组件，
+    onGestureEvent 在手指触碰时会一直触发 */}
+        <PanGestureHandler
+          ref={panRef}
+          simultaneousHandlers={[tapRef, nativeRef]}
+          onGestureEvent={onGestureEvent}
+          onHandlerStateChange={onHandlerStateChange}>
+          <Animated.View
+            style={[
+              styles.container,
               {
-                translateY: translateY.interpolate({
-                  inputRange: RANGE,
-                  outputRange: RANGE,
-                  extrapolate: 'clamp',
-                }),
+                transform: [
+                  {
+                    translateY: translateY.interpolate({
+                      inputRange: RANGE,
+                      outputRange: RANGE,
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ],
               },
-            ],
-          },
-        ]}>
-        {renderHeader}
-        <View style={{height: viewportHeight - headerHeight}}>
-          <Tab />
-        </View>
-      </Animated.View>
-    </PanGestureHandler>
+            ]}>
+            {renderHeader}
+            <View style={{height: viewportHeight - headerHeight}}>
+              <Tab
+                panRef={panRef}
+                tapRef={tapRef}
+                nativeRef={nativeRef}
+                onScrollDrag={onScrollDrag}
+                onItemPress={onItemPress}
+              />
+            </View>
+          </Animated.View>
+        </PanGestureHandler>
+      </View>
+    </TapGestureHandler>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -224,6 +312,14 @@ const styles = StyleSheet.create({
   name: {
     color: '#fff',
   },
+  tab: {
+    backgroundColor: '#fff',
+  },
 });
 
-export default connector(Album);
+const Wrapper: React.FC<IProps> = (props: IProps) => {
+  const headerHeight = useHeaderHeight();
+  return <Album {...props} headerHeight={headerHeight} />;
+};
+
+export default connector(Wrapper);

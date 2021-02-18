@@ -7,12 +7,12 @@ import Icon from '@/assets/iconfont';
 interface IProps {
   data: IProgram;
   index: number;
-  onPress: (data: IProgram) => void;
+  onPress: (data: IProgram, index: number) => void;
 }
 const Item: React.FC<IProps> = ({data, index, onPress}) => {
   const onItemPress = useCallback(() => {
-    onPress(data);
-  }, [data, onPress]);
+    onPress(data, index);
+  }, [data, index, onPress]);
 
   return (
     <Touchable style={styles.item} onPress={onItemPress}>
