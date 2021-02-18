@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     ...Platform.select({
       android: {
-        elevation: false,
+        elevation: 0,
         borderBottomColor: '#e3e3e3',
         borderBottomWidth: StyleSheet.hairlineWidth,
       },

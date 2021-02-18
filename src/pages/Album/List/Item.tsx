@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     color: '#939393',
   },
   date: {
-    color: '#939393',   
-  }
+    color: '#939393',
+  },
 });
 export default Item;

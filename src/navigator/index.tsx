@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {NavigationContainer, RouteProp} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
@@ -7,7 +7,6 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import BottomTabs from './BottomTabs';
-import Detail from '@/pages/Detail';
 import {Platform, StatusBar, StyleSheet} from 'react-native';
 import Category from '@/pages/Category';
 import Album from '@/pages/Album';
@@ -49,11 +48,11 @@ const getAlbumOptions = ({
   };
 };
 const styles = StyleSheet.create({
-  headerBackground:{
+  headerBackground: {
     flex: 1,
     backgroundColor: '#fff',
     opacity: 0,
-  }
+  },
 });
 const Navigator: React.FC = () => {
   return (
