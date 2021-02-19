@@ -176,6 +176,7 @@ const Album: React.FC<IProps> = ({
           previousId: previousItem && previousItem.id,
           nextId: nextItem && nextItem.id,
           title: data.title,
+          thumbnail: route.params.item.image,
           sounds: list.map((item) => ({id: item.id, title: item.title})),
         },
       });
@@ -183,13 +184,13 @@ const Album: React.FC<IProps> = ({
         id: data.id,
       });
     },
-    [dispatch, list, navigation],
+    [dispatch, list, navigation, route.params.item.image],
   );
 
   const renderHeader = useMemo(() => {
     const {title, image} = route.params.item;
     if (!image || !author.avatar) {
-      return null;
+      return <View style={[styles.header, {paddingTop: headerHeight}]} />;
     }
     return (
       <View style={[styles.header, {paddingTop: headerHeight}]}>

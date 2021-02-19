@@ -2,18 +2,21 @@ import Touchable from '@/components/Touchable';
 import {RootState} from '@/models/index';
 import {ModalStackNavigation, ModalStackParamList} from '@/navigator/index';
 import {RouteProp} from '@react-navigation/native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Animated, StyleSheet, Text, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import Icon from '@/assets/iconfont';
 import PlaySlider from './PlaySlider';
+import {viewportWidth} from '@/utils/index';
+import LinearGradient from 'react-native-linear-gradient';
 
 const mapStateToProps = ({player}: RootState) => {
   return {
     soundUrl: player.soundUrl,
     playState: player.playState,
     title: player.title,
+    thumbnail: player.thumbnail,
     previousId: player.previousId,
     nextId: player.nextId,
   };
@@ -27,15 +30,24 @@ interface IProps extends ModelState {
   navigation: ModalStackNavigation;
   route: RouteProp<ModalStackParamList, 'Detail'>;
 }
+
+const IMAGE_WIDTH = 180;
+const SCALE = viewportWidth / IMAGE_WIDTH;
+
 const Detail: React.FC<IProps> = ({
   route,
   dispatch,
   playState,
   title,
+  thumbnail,
   navigation,
   previousId,
   nextId,
 }) => {
+  const [isBarrage, setIsBarrage] = useState(false);
+
+  const anim = new Animated.Value(1);
+
   useEffect(() => {
     dispatch({
       type: 'player/fetchShow',
@@ -69,8 +81,41 @@ const Detail: React.FC<IProps> = ({
     });
   }, [dispatch]);
 
+  const barrage = useCallback(() => {
+    setIsBarrage(!isBarrage);
+    Animated.timing(anim, {
+      toValue: isBarrage ? 1 : SCALE,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, isBarrage]);
+
   return (
     <View style={styles.container}>
+      <View style={styles.imageView}>
+        <Animated.Image
+          source={{uri: thumbnail}}
+          style={[
+            styles.image,
+            {
+              transform: [
+                {
+                  scale: anim,
+                },
+              ],
+            },
+          ]}
+        />
+      </View>
+      {isBarrage && (
+        <LinearGradient
+          colors={['rgba(128,104,102,0.5)', '#807c66']}
+          style={styles.linear}
+        />
+      )}
+      <Touchable style={styles.barrageBtn} onPress={barrage}>
+        <Text style={styles.barrageText}>弹幕</Text>
+      </Touchable>
       <PlaySlider />
       <View style={styles.control}>
         <Touchable
@@ -94,9 +139,11 @@ const Detail: React.FC<IProps> = ({
   );
 };
 
+const PADDING_TOP = (viewportWidth - IMAGE_WIDTH) / 2;
+
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 100,
+    paddingTop: PADDING_TOP,
   },
   control: {
     flexDirection: 'row',
@@ -107,6 +154,35 @@ const styles = StyleSheet.create({
   },
   button: {
     marginHorizontal: 10,
+  },
+  imageView: {
+    alignItems: 'center',
+    height: IMAGE_WIDTH,
+  },
+  image: {
+    width: IMAGE_WIDTH,
+    height: IMAGE_WIDTH,
+    borderRadius: 8,
+    backgroundColor: '#ccc',
+  },
+  barrageBtn: {
+    width: 40,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderColor: '#fff',
+    borderWidth: 1,
+    marginLeft: 10,
+  },
+  barrageText: {
+    color: '#fff',
+  },
+  linear: {
+    position: 'absolute',
+    top: 0,
+    height: viewportWidth,
+    width: viewportWidth,
   },
 });
 

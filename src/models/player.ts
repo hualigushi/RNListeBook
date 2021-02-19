@@ -16,6 +16,7 @@ const SHOW_URL = '/mock/11/bear/show';
 export interface PlayerModelState {
   id: string;
   title: string;
+  thumbnail: string;
   soundUrl: string;
   playState: string;
   currentTime: number;
@@ -44,6 +45,7 @@ export interface PlayerModel extends Model {
 const initialState: PlayerModelState = {
   id: '',
   title: '',
+  thumbnail: '',
   soundUrl: '',
   playState: '',
   currentTime: 0,
