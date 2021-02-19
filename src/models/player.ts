@@ -1,16 +1,28 @@
-import {getCurrentTime, getDuration, init, pause, play} from '@/config/sound';
+import {
+  getCurrentTime,
+  getDuration,
+  init,
+  pause,
+  play,
+  stop,
+} from '@/config/sound';
 import axios from 'axios';
 import {Effect, EffectsCommandMap, EffectWithType, Model} from 'dva-core-ts';
 import {Reducer} from 'redux';
+import {RootState} from '.';
 
 const SHOW_URL = '/mock/11/bear/show';
 
 export interface PlayerModelState {
   id: string;
+  title: string;
   soundUrl: string;
   playState: string;
   currentTime: number;
   duration: number;
+  previousId: string;
+  nextId: string;
+  sounds: {id: string; title: string}[];
 }
 
 export interface PlayerModel extends Model {
@@ -24,15 +36,21 @@ export interface PlayerModel extends Model {
     play: Effect;
     pause: Effect;
     watcherCurrentTime: EffectWithType; // 该类型是一个数组类型，第一个参数是生成器函数，第二个参数是一个对象
+    previous: Effect;
+    next: Effect;
   };
 }
 
 const initialState: PlayerModelState = {
   id: '',
+  title: '',
   soundUrl: '',
   playState: '',
   currentTime: 0,
   duration: 0,
+  previousId: '',
+  nextId: '',
+  sounds: [],
 };
 
 const delay = (timeout: number) =>
@@ -67,7 +85,7 @@ const playerModel: PlayerModel = {
     },
   },
   effects: {
-    *fetchShow(payload, {call, put}) {
+    *fetchShow({payload}, {call, put}) {
       const {data} = yield call(axios.get, SHOW_URL, {
         params: {
           id: payload.id,
@@ -77,7 +95,7 @@ const playerModel: PlayerModel = {
       yield put({
         type: 'setState',
         payload: {
-          id: data.id,
+          id: payload.id,
           soundUrl: data.soundUrl,
           duration: getDuration(),
         },
@@ -93,7 +111,11 @@ const playerModel: PlayerModel = {
           playState: 'playing',
         },
       });
-      yield call(play);
+      try {
+        yield call(play);
+      } catch (e) {
+        console.log('play failed');
+      }
       yield put({
         type: 'setState',
         payload: {
@@ -123,6 +145,60 @@ const playerModel: PlayerModel = {
         type: 'watcher', // dva加载后执行函数
       },
     ],
+    *previous({payload}, {call, put, select}) {
+      yield call(stop);
+      // 当前播放的音频
+      const {id, sounds}: PlayerModelState = yield select(
+        ({player}: RootState) => player,
+      );
+      const index = sounds.findIndex((item) => item.id === id);
+      const currentIndex = index - 1; // 当前需要播放的下标
+      const currentItem = sounds[currentIndex];
+      const previousItem = sounds[currentIndex - 1];
+      yield put({
+        type: 'setState',
+        payload: {
+          playState: 'paused',
+          id: currentItem.id,
+          title: currentItem.title,
+          previousId: previousItem ? previousItem.id : '',
+          nextId: id,
+        },
+      });
+      yield put({
+        type: 'fetchShow',
+        payload: {
+          id: currentItem.id,
+        },
+      });
+    },
+    *next({payload}, {call, put, select}) {
+      yield call(stop);
+      // 当前播放的音频
+      const {id, sounds}: PlayerModelState = yield select(
+        ({player}: RootState) => player,
+      );
+      const index = sounds.findIndex((item) => item.id === id);
+      const currentIndex = index + 1; // 当前需要播放的下标
+      const currentItem = sounds[currentIndex];
+      const nextItem = sounds[currentIndex + 1];
+      yield put({
+        type: 'setState',
+        payload: {
+          playState: 'paused',
+          id: currentItem.id,
+          title: currentItem.title,
+          previousId: id,
+          nextId: nextItem ? nextItem.id : '',
+        },
+      });
+      yield put({
+        type: 'fetchShow',
+        payload: {
+          id: currentItem.id,
+        },
+      });
+    },
   },
 };
 

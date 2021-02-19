@@ -49,6 +49,18 @@ const pause = () => {
   });
 };
 
+const stop = () => {
+  return new Promise((resolve) => {
+    if (sound) {
+      sound.stop(() => {
+        resolve(1);
+      });
+    } else {
+      resolve(0);
+    }
+  });
+};
+
 // 获取当前播放时间
 const getCurrentTime = () => {
   return new Promise((resolve) => {
@@ -68,4 +80,4 @@ const getDuration = () => {
   return 0;
 };
 
-export {init, play, pause, getCurrentTime, getDuration};
+export {init, play, pause, stop, getCurrentTime, getDuration};

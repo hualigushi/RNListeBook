@@ -11,7 +11,12 @@ import {
   PanGestureHandler,
   TapGestureHandler,
 } from 'react-native-gesture-handler';
-import {SceneRendererProps, TabBar, TabView} from 'react-native-tab-view';
+import {
+  NavigationState,
+  SceneRendererProps,
+  TabBar,
+  TabView,
+} from 'react-native-tab-view';
 import Introdution from './Introdution';
 import List from './List';
 
@@ -20,9 +25,7 @@ interface IRoute {
   title: string;
 }
 
-interface IState {
-  routes: IRoute[];
-}
+type IState = NavigationState<IRoute>;
 
 export interface ITabProps {
   panRef: React.RefObject<PanGestureHandler>;

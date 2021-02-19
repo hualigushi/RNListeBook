@@ -1,5 +1,13 @@
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {StyleSheet, Text, View, Image, Animated} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Animated,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import {useHeaderHeight} from '@react-navigation/stack';
 import {RootState} from '@/models/index';
 import {connect, ConnectedProps} from 'react-redux';
@@ -22,6 +30,7 @@ const mapStateToProps = ({album}: RootState) => {
   return {
     summary: album.summary,
     author: album.author,
+    list: album.list,
   };
 };
 
@@ -42,6 +51,7 @@ const Album: React.FC<IProps> = ({
   route,
   summary,
   author,
+  list,
   headerHeight,
 }) => {
   const tapRef = useRef<TapGestureHandler>(null);
@@ -79,14 +89,28 @@ const Album: React.FC<IProps> = ({
     //   duration: 3000, // 在3秒将translateY有0改为-170
     //   useNativeDriver: true,
     // }).start();
-    navigation.setParams({
-      opacity: translateY.interpolate({
-        inputRange: RANGE,
-        outputRange: [1, 0],
-      }),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, route.params.item]);
+
+  // useEffect(() => {
+  //   console.log('useEffect ~ translateY', translateY);
+  //   navigation.setParams({
+  //     opacity: translateY.interpolate({
+  //       inputRange: RANGE,
+  //       outputRange: [1, 0],
+  //     }),
+  //   });
+  // }, [RANGE, navigation, translateY]);
+
+  // 监听FlatList滚动
+  const onScrollDrag = Animated.event(
+    [{nativeEvent: {contentOffset: {y: lastScrollY}}}],
+    {
+      useNativeDriver: USE_NATIVE_DRIVER,
+      listener: ({nativeEvent}: NativeSyntheticEvent<NativeScrollEvent>) => {
+        lastScrollYValue.current = (nativeEvent as any).contentOffset.y;
+      },
+    },
+  );
 
   // 在手指拖动时一直触发
   // Animated.event 用来映射动画值
@@ -97,24 +121,13 @@ const Album: React.FC<IProps> = ({
     },
   );
 
-  // 监听FlatList滚动
-  const onScrollDrag = Animated.event<{contentOffset: {y: number}}>(
-    [{nativeEvent: {contentOffset: {y: lastScrollY}}}],
-    {
-      useNativeDriver: USE_NATIVE_DRIVER,
-      listener: ({nativeEvent}) => {
-        lastScrollYValue.current = nativeEvent.contentOffset.y;
-      },
-    },
-  );
-
   // 手势状态发生变化时回调
   const onHandlerStateChange = useCallback(
     ({nativeEvent}: PanGestureHandlerStateChangeEvent) => {
       // 离开之前的上一次状态是活动的
       if (nativeEvent.oldState === State.ACTIVE) {
         let {translationY} = nativeEvent;
-        translationY -= lastScrollYValue.current;
+        translationY = translationY - lastScrollYValue.current;
         // Animated.Value
         // value
         // offset = value
@@ -124,7 +137,7 @@ const Album: React.FC<IProps> = ({
         // value = value + offset
         translationYY.setValue(0);
         translationYValue.current = translationYValue.current + translationY;
-        let maxDeltaY = -RANGE[0];
+        let maxDeltaY = -RANGE[0] - translationYValue.current;
         if (translationYValue.current < RANGE[0]) {
           translationYValue.current = RANGE[0];
           Animated.timing(translationYOffset, {
@@ -154,26 +167,23 @@ const Album: React.FC<IProps> = ({
   );
 
   const onItemPress = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (data: IProgram, index: number) => {
-      // const previousItem: IProgram = data.list[index - 1];
-      // const nextItem: IProgram = data.list[index + 1];
-      let params = {
+      const previousItem: IProgram = list[index - 1];
+      const nextItem: IProgram = list[index + 1];
+      dispatch({
+        type: 'player/setState',
+        payload: {
+          previousId: previousItem && previousItem.id,
+          nextId: nextItem && nextItem.id,
+          title: data.title,
+          sounds: list.map((item) => ({id: item.id, title: item.title})),
+        },
+      });
+      navigation.navigate('Detail', {
         id: data.id,
-      };
-      // dispatch({
-      //   type: 'player/setState',
-      //   payload: {
-      //     playList: data.list.map((item) => item.id),
-      //     currentId: item.id,
-      //     previousId: previousItem && previousItem.id,
-      //     nextId: nextItem && nextItem.id,
-      //   },
-      // });
-      navigation.navigate('Detail', params);
+      });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [dispatch, list, navigation],
   );
 
   const renderHeader = useMemo(() => {
