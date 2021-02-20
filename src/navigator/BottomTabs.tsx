@@ -11,9 +11,11 @@ import {
   TabNavigationState,
 } from '@react-navigation/native';
 import HomeTabs from './HomeTabs';
+import Play from '@/pages/views/Play';
 export type BottomTabParamList = {
   HomeTabs: undefined;
   Listen: undefined;
+  Play: undefined;
   Found: undefined;
   Account: undefined;
 };
@@ -72,6 +74,15 @@ const BottomTabs: React.FC<IProps> = ({navigation, route}) => {
           tabBarIcon: ({color, size}) => (
             <Icon name="icon-shoucang" size={size} color={color} />
           ),
+        }}
+      />
+      <Tab.Screen
+        name="Play"
+        component={Play}
+        options={{
+          tabBarButton: () => {
+            return <Play />;
+          },
         }}
       />
       <Tab.Screen

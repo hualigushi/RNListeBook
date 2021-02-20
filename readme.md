@@ -261,3 +261,7 @@ react native是有手势响应系统的，比如View组件就有一系列的函�
 
 ## 声音进度条
 `npm install react-native-slider-x -S`
+
+## 底部标签播放进度条
+底层以来react-native-svg, 生成圆形进度条
+`npm install react-native-circular-progress -S`
