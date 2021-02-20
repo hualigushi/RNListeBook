@@ -63,17 +63,20 @@ const Album: React.FC<IProps> = ({
   const translationYValue = useRef(0);
   const lastScrollYValue = useRef(0);
 
-  const translationYY = new Animated.Value(0);
-  const lastScrollY = new Animated.Value(0);
-  const translationYOffset = new Animated.Value(0);
-  const reverseLastScrollY = Animated.multiply(
-    new Animated.Value(-1),
-    lastScrollY,
-  );
-  const translateY = Animated.add(
-    Animated.add(translationYY, reverseLastScrollY),
-    translationYOffset,
-  );
+  const translationYY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(new Animated.Value(0)).current;
+  const translationYOffset = useRef(new Animated.Value(0)).current;
+  const reverseLastScrollY = useRef(
+    Animated.multiply(useRef(new Animated.Value(-1)).current, lastScrollY),
+  ).current;
+
+  const translateY = useRef(
+    Animated.add(
+      Animated.add(translationYY, reverseLastScrollY),
+      translationYOffset,
+    ),
+  ).current;
+  console.log('translateY--------', translateY);
 
   useEffect(() => {
     const {id} = route.params.item;
@@ -91,15 +94,15 @@ const Album: React.FC<IProps> = ({
     // }).start();
   }, [dispatch, route.params.item]);
 
-  // useEffect(() => {
-  //   console.log('useEffect ~ translateY', translateY);
-  //   navigation.setParams({
-  //     opacity: translateY.interpolate({
-  //       inputRange: RANGE,
-  //       outputRange: [1, 0],
-  //     }),
-  //   });
-  // }, [RANGE, navigation, translateY]);
+  useEffect(() => {
+    navigation.setParams({
+      opacity: translateY.interpolate({
+        inputRange: RANGE,
+        outputRange: [1, 0],
+      }),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 监听FlatList滚动
   const onScrollDrag = Animated.event(
