@@ -2,7 +2,7 @@ import Touchable from '@/components/Touchable';
 import {RootState} from '@/models/index';
 import {ModalStackNavigation, ModalStackParamList} from '@/navigator/index';
 import {RouteProp} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useCallback} from 'react';
 import {Animated, StyleSheet, Text, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
@@ -10,6 +10,30 @@ import Icon from '@/assets/iconfont';
 import PlaySlider from './PlaySlider';
 import {viewportWidth} from '@/utils/index';
 import LinearGradient from 'react-native-linear-gradient';
+import Barrage, {Message} from '@/components/Barrage';
+
+const data: string[] = [
+  '最灵繁的人也看不见自己的背脊',
+  '朝闻道，夕死可矣',
+  '阅读是人类进步的阶梯',
+  '内外相应，言行相称',
+  '人的一生是短的',
+  '抛弃时间的人，时间也抛弃他',
+  '自信在于沉稳',
+  '过犹不及',
+  '开卷有益',
+  '有志者事竟成',
+  '合理安排时间，就等于节约时间',
+  '成功源于不懈的努力',
+];
+
+function randomIndex(length: number) {
+  return Math.floor(Math.random() * length);
+}
+
+function getText() {
+  return data[randomIndex(data.length)];
+}
 
 const mapStateToProps = ({player}: RootState) => {
   return {
@@ -45,8 +69,25 @@ const Detail: React.FC<IProps> = ({
   nextId,
 }) => {
   const [isBarrage, setIsBarrage] = useState(false);
+  const [barrageData, setBarrageData] = useState<Message[]>([]);
+  const timer = useRef<any>(null);
 
-  const anim = new Animated.Value(1);
+  const anim = useRef(new Animated.Value(0)).current;
+
+  const addBarrage = useCallback(() => {
+    timer.current = setInterval(() => {
+      if (isBarrage) {
+        const id = Date.now();
+        const titleB = getText();
+        setBarrageData([
+          {
+            id,
+            title: titleB,
+          },
+        ]);
+      }
+    }, 5000);
+  }, [isBarrage]);
 
   useEffect(() => {
     dispatch({
@@ -62,6 +103,13 @@ const Detail: React.FC<IProps> = ({
       headerTitle: title,
     });
   }, [navigation, title]);
+
+  useEffect(() => {
+    addBarrage();
+    return () => {
+      clearInterval(timer.current);
+    };
+  }, [addBarrage]);
 
   const toggle = useCallback(() => {
     dispatch({
@@ -83,8 +131,11 @@ const Detail: React.FC<IProps> = ({
 
   const barrage = useCallback(() => {
     setIsBarrage(!isBarrage);
+  }, [isBarrage]);
+
+  useEffect(() => {
     Animated.timing(anim, {
-      toValue: isBarrage ? 1 : SCALE,
+      toValue: isBarrage ? SCALE : 1,
       duration: 100,
       useNativeDriver: true,
     }).start();
@@ -97,7 +148,9 @@ const Detail: React.FC<IProps> = ({
           source={{uri: thumbnail}}
           style={[
             styles.image,
+            // eslint-disable-next-line react-native/no-inline-styles
             {
+              borderRadius: isBarrage ? 0 : 8,
               transform: [
                 {
                   scale: anim,
@@ -108,10 +161,13 @@ const Detail: React.FC<IProps> = ({
         />
       </View>
       {isBarrage && (
-        <LinearGradient
-          colors={['rgba(128,104,102,0.5)', '#807c66']}
-          style={styles.linear}
-        />
+        <>
+          <LinearGradient
+            colors={['rgba(128,104,102,0.5)', '#807c66']}
+            style={styles.linear}
+          />
+          <Barrage data={barrageData} maxTrack={5} style={{top: PADDING_TOP}} />
+        </>
       )}
       <Touchable style={styles.barrageBtn} onPress={barrage}>
         <Text style={styles.barrageText}>弹幕</Text>

@@ -76,7 +76,6 @@ const Album: React.FC<IProps> = ({
       translationYOffset,
     ),
   ).current;
-  console.log('translateY--------', translateY);
 
   useEffect(() => {
     const {id} = route.params.item;
@@ -95,12 +94,14 @@ const Album: React.FC<IProps> = ({
   }, [dispatch, route.params.item]);
 
   useEffect(() => {
-    navigation.setParams({
-      opacity: translateY.interpolate({
-        inputRange: RANGE,
-        outputRange: [1, 0],
-      }),
-    });
+    if (list.length) {
+      navigation.setParams({
+        opacity: translateY.interpolate({
+          inputRange: RANGE,
+          outputRange: [1, 0],
+        }),
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
