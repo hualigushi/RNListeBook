@@ -18,7 +18,7 @@ import Album from '@/pages/Album';
 import Detail from '@/pages/Detail';
 import Icon from '@/assets/iconfont';
 import PlayView from '@/pages/views/PlayView';
-import {getActiveRouteName} from '../utils';
+import {getActiveRouteName, navigationRef} from '../utils';
 
 export type RootStackParamList = {
   BottomTabs: {
@@ -186,7 +186,7 @@ const Navigator: React.FC = () => {
   }, []);
   return (
     // 堆栈导航器嵌套标签导航器
-    <NavigationContainer onStateChange={onStateChange}>
+    <NavigationContainer ref={navigationRef} onStateChange={onStateChange}>
       <ModalStackScreen />
       <PlayView routeName={routeName} />
     </NavigationContainer>

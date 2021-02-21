@@ -37,6 +37,7 @@ function getText() {
 
 const mapStateToProps = ({player}: RootState) => {
   return {
+    id: player.id,
     soundUrl: player.soundUrl,
     playState: player.playState,
     title: player.title,
@@ -67,6 +68,7 @@ const Detail: React.FC<IProps> = ({
   navigation,
   previousId,
   nextId,
+  id,
 }) => {
   const [isBarrage, setIsBarrage] = useState(false);
   const [barrageData, setBarrageData] = useState<Message[]>([]);
@@ -90,13 +92,19 @@ const Detail: React.FC<IProps> = ({
   }, [isBarrage]);
 
   useEffect(() => {
-    dispatch({
-      type: 'player/fetchShow',
-      payload: {
-        id: route.params.id,
-      },
-    });
-  }, [dispatch, route.params.id]);
+    if (route.params && route.params.id !== id) {
+      dispatch({
+        type: 'player/fetchShow',
+        payload: {
+          id: route.params.id,
+        },
+      });
+    } else {
+      dispatch({
+        type: 'player/play',
+      });
+    }
+  }, [dispatch, id, route.params]);
 
   useEffect(() => {
     navigation.setOptions({

@@ -79,11 +79,11 @@ const BottomTabs: React.FC<IProps> = ({navigation, route}) => {
       <Tab.Screen
         name="Play"
         component={Play}
-        options={{
+        options={({navigation}) => ({
           tabBarButton: () => {
-            return <Play />;
+            return <Play onPress={() => navigation.navigate('Detail')} />;
           },
-        }}
+        })}
       />
       <Tab.Screen
         name="Found"

@@ -1,6 +1,6 @@
 import {RootState} from '@/models/index';
-import {viewportWidth} from '@/utils/index';
-import React from 'react';
+import {navigate, viewportWidth} from '@/utils/index';
+import React, {useCallback} from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import {connect, ConnectedProps} from 'react-redux';
 import Play from './Play';
@@ -18,6 +18,9 @@ interface Iprops extends ModelState {
   routeName: string;
 }
 const PlayView: React.FC<Iprops> = ({routeName, playState}) => {
+  const onPress = useCallback(() => {
+    navigate('Detail');
+  }, []);
   // 判断当前所在的页面
   if (
     routeName === 'Root' ||
@@ -28,7 +31,7 @@ const PlayView: React.FC<Iprops> = ({routeName, playState}) => {
   }
   return (
     <View style={styles.container}>
-      <Play />
+      <Play onPress={onPress} />
     </View>
   );
 };

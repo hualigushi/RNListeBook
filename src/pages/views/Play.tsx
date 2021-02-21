@@ -1,5 +1,5 @@
 import Touchable from '@/components/Touchable';
-import React, {useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {Animated, Easing, Image, StyleSheet} from 'react-native';
 import Icon from '@/assets/iconfont';
 import {RootState} from '@/models/index';
@@ -16,9 +16,11 @@ const mapStateToProps = ({player}: RootState) => {
 const connector = connect(mapStateToProps);
 type ModelState = ConnectedProps<typeof connector>;
 
-interface Iprops extends ModelState {}
+interface Iprops extends ModelState {
+  onPress: () => void;
+}
 
-const Play: React.FC<Iprops> = ({thumbnail, playState}) => {
+const Play: React.FC<Iprops> = ({thumbnail, playState, onPress}) => {
   const anim = useRef(new Animated.Value(0)).current;
   let rotate = useRef<any>('0deg');
   let timing = useRef<any>(null);
@@ -38,6 +40,12 @@ const Play: React.FC<Iprops> = ({thumbnail, playState}) => {
     outputRange: ['0deg', '360deg'],
   });
 
+  const onPlayPress = useCallback(() => {
+    if (thumbnail && onPress) {
+      onPress();
+    }
+  }, [onPress, thumbnail]);
+
   useEffect(() => {
     if (timing.current && rotate.current && playState === 'playing') {
       timing.current.start();
@@ -47,7 +55,7 @@ const Play: React.FC<Iprops> = ({thumbnail, playState}) => {
   }, [playState]);
 
   return (
-    <Touchable style={styles.play}>
+    <Touchable style={styles.play} onPress={onPlayPress}>
       <Progress>
         <Animated.View
           style={{
