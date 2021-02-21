@@ -1,5 +1,5 @@
 import realm, {IProgram} from '@/config/realm';
-import React from 'react';
+import React, {useCallback} from 'react';
 import {
   FlatList,
   Image,
@@ -10,8 +10,16 @@ import {
 } from 'react-native';
 import {formatTime} from '../utils';
 import Icon from '@/assets/iconfont';
+import Touchable from '@/components/Touchable';
 
 const Listen: React.FC = () => {
+  const deletePro = useCallback((item: IProgram) => {
+    realm.write(() => {
+      const program = realm.objects('Program').filtered(`id='${item.id}'`);
+      realm.delete(program);
+    });
+  }, []);
+
   const programs = realm.objects<IProgram>('Program');
   const renderItem = ({item}: ListRenderItemInfo<IProgram>) => {
     return (
@@ -25,6 +33,9 @@ const Listen: React.FC = () => {
             <Text style={styles.rate}>已播：{item.rate}%</Text>
           </View>
         </View>
+        <Touchable onPress={() => deletePro(item)} style={styles.deleteBtn}>
+          <Icon name="icon-shijian" color="#999" size={14} />
+        </Touchable>
       </View>
     );
   };
@@ -62,6 +73,10 @@ const styles = StyleSheet.create({
   rate: {
     marginLeft: 20,
     color: '#f6a624',
+  },
+  deleteBtn: {
+    padding: 10,
+    justifyContent: 'center',
   },
 });
 export default Listen;
