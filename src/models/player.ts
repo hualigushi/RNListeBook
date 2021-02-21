@@ -1,3 +1,4 @@
+import {saveProgram} from '@/config/realm';
 import {
   getCurrentTime,
   getDuration,
@@ -16,7 +17,7 @@ const SHOW_URL = '/mock/11/bear/show';
 export interface PlayerModelState {
   id: string;
   title: string;
-  thumbnail: string;
+  thumbnailUrl: string;
   soundUrl: string;
   playState: string;
   currentTime: number;
@@ -45,7 +46,7 @@ export interface PlayerModel extends Model {
 const initialState: PlayerModelState = {
   id: '',
   title: '',
-  thumbnail: '',
+  thumbnailUrl: '',
   soundUrl: '',
   playState: 'paused',
   currentTime: 0,
@@ -87,7 +88,7 @@ const playerModel: PlayerModel = {
     },
   },
   effects: {
-    *fetchShow({payload}, {call, put}) {
+    *fetchShow({payload}, {call, put, select}) {
       yield call(stop);
       const {data} = yield call(axios.get, SHOW_URL, {
         params: {
@@ -105,6 +106,19 @@ const playerModel: PlayerModel = {
       });
       yield put({
         type: 'play',
+      });
+      const {
+        id,
+        title,
+        thumbnailUrl,
+        currentTime,
+      }: PlayerModelState = yield select(({player}: RootState) => player);
+      saveProgram({
+        id,
+        title,
+        thumbnailUrl,
+        currentTime,
+        duration: getDuration(),
       });
     },
     *play({payload}, {call, put}) {
@@ -126,13 +140,20 @@ const playerModel: PlayerModel = {
         },
       });
     },
-    *pause({payload}, {call, put}) {
+    *pause({payload}, {call, put, select}) {
       yield call(pause);
       yield put({
         type: 'setState',
         payload: {
           playState: 'paused',
         },
+      });
+      const {id, currentTime}: PlayerModelState = yield select(
+        ({player}: RootState) => player,
+      );
+      saveProgram({
+        id,
+        currentTime,
       });
     },
     watcherCurrentTime: [

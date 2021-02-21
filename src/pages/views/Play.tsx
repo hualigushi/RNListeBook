@@ -8,7 +8,7 @@ import Progress from './Progress';
 
 const mapStateToProps = ({player}: RootState) => {
   return {
-    thumbnail: player.thumbnail,
+    thumbnailUrl: player.thumbnailUrl,
     playState: player.playState,
   };
 };
@@ -20,7 +20,7 @@ interface Iprops extends ModelState {
   onPress: () => void;
 }
 
-const Play: React.FC<Iprops> = ({thumbnail, playState, onPress}) => {
+const Play: React.FC<Iprops> = ({thumbnailUrl, playState, onPress}) => {
   const anim = useRef(new Animated.Value(0)).current;
   let rotate = useRef<any>('0deg');
   let timing = useRef<any>(null);
@@ -41,10 +41,10 @@ const Play: React.FC<Iprops> = ({thumbnail, playState, onPress}) => {
   });
 
   const onPlayPress = useCallback(() => {
-    if (thumbnail && onPress) {
+    if (thumbnailUrl && onPress) {
       onPress();
     }
-  }, [onPress, thumbnail]);
+  }, [onPress, thumbnailUrl]);
 
   useEffect(() => {
     if (timing.current && rotate.current && playState === 'playing') {
@@ -65,11 +65,11 @@ const Play: React.FC<Iprops> = ({thumbnail, playState, onPress}) => {
               },
             ],
           }}>
-          {thumbnail ? (
+          {thumbnailUrl ? (
             <Image
               style={styles.image}
               source={{
-                uri: thumbnail,
+                uri: thumbnailUrl,
               }}
             />
           ) : (

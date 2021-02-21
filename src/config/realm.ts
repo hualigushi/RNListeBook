@@ -1,5 +1,4 @@
 import Realm from 'realm';
-
 export interface IProgram {
   id: string;
   title: string;
@@ -32,7 +31,7 @@ const realm = new Realm({
   schema: [Program],
 });
 
-export function saveProgram(data: any) {
+export function saveProgram(data: Partial<IProgram>) {
   try {
     realm.write(() => {
       realm.create('Program', data, Realm.UpdateMode.All);

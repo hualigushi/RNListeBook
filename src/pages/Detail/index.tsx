@@ -41,7 +41,7 @@ const mapStateToProps = ({player}: RootState) => {
     soundUrl: player.soundUrl,
     playState: player.playState,
     title: player.title,
-    thumbnail: player.thumbnail,
+    thumbnailUrl: player.thumbnailUrl,
     previousId: player.previousId,
     nextId: player.nextId,
   };
@@ -64,7 +64,7 @@ const Detail: React.FC<IProps> = ({
   dispatch,
   playState,
   title,
-  thumbnail,
+  thumbnailUrl,
   navigation,
   previousId,
   nextId,
@@ -153,7 +153,7 @@ const Detail: React.FC<IProps> = ({
     <View style={styles.container}>
       <View style={styles.imageView}>
         <Animated.Image
-          source={{uri: thumbnail}}
+          source={{uri: thumbnailUrl}}
           style={[
             styles.image,
             // eslint-disable-next-line react-native/no-inline-styles
