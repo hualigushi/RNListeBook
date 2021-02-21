@@ -1,5 +1,9 @@
-import React from 'react';
-import {NavigationContainer, RouteProp} from '@react-navigation/native';
+import React, {useCallback, useState} from 'react';
+import {
+  NavigationContainer,
+  NavigationState,
+  RouteProp,
+} from '@react-navigation/native';
 import {
   CardStyleInterpolators,
   createStackNavigator,
@@ -13,6 +17,8 @@ import Category from '@/pages/Category';
 import Album from '@/pages/Album';
 import Detail from '@/pages/Detail';
 import Icon from '@/assets/iconfont';
+import PlayView from '@/pages/views/PlayView';
+import {getActiveRouteName} from '../utils';
 
 export type RootStackParamList = {
   BottomTabs: {
@@ -170,10 +176,19 @@ const ModalStackScreen = () => {
 };
 
 const Navigator: React.FC = () => {
+  const [routeName, setRouteName] = useState('Root');
+
+  const onStateChange = useCallback((state: NavigationState | undefined) => {
+    if (typeof state !== 'undefined') {
+      const name = getActiveRouteName(state);
+      setRouteName(name);
+    }
+  }, []);
   return (
     // 堆栈导航器嵌套标签导航器
-    <NavigationContainer>
+    <NavigationContainer onStateChange={onStateChange}>
       <ModalStackScreen />
+      <PlayView routeName={routeName} />
     </NavigationContainer>
   );
 };

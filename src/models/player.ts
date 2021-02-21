@@ -47,7 +47,7 @@ const initialState: PlayerModelState = {
   title: '',
   thumbnail: '',
   soundUrl: '',
-  playState: '',
+  playState: 'paused',
   currentTime: 0,
   duration: 0,
   previousId: '',
