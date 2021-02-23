@@ -268,4 +268,7 @@ react native是有手势响应系统的，比如View组件就有一系列的函�
 
 ## realm数据库
 `npm install realm -S`
-`
+
+## 视频播放
+`npm install react-native-video react-native-video-custom-controls -S`
+`npm i --save-dev @types/react-native-video`

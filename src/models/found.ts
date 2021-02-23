@@ -7,21 +7,12 @@ import VideoPlayer from 'react-native-video-player';
 
 const FOUND_URL = '/mock/11/bear/found/list';
 
-// export interface IFound {
-//   id: string;
-//   thumbnailUrl: string;
-//   videoUrl: string;
-//   forward: string;
-//   comment: number;
-//   like: number;
-//   backgroundColor: string;
-//   user: {
-//     id: string;
-//     name: string;
-//     avatar: string;
-//   };
-//   playerRef: React.RefObject<VideoPlayer>;
-// }
+export interface IFound {
+  id: string;
+  title: string;
+  videoUrl: string;
+  //   playerRef: React.RefObject<VideoPlayer>;
+}
 
 // export interface FoundState {
 //   list: IFound[];
