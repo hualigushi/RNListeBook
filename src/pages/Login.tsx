@@ -30,7 +30,7 @@ const initialValues: Values = {
   password: '',
 };
 
-const Login: React.FC<IProps> = ({dispatch}) => {
+const Login: React.FC<IProps> = ({dispatch, loading}) => {
   const onSubmit = useCallback(
     (values: Values) => {
       dispatch({
@@ -68,7 +68,10 @@ const Login: React.FC<IProps> = ({dispatch}) => {
                 name="password"
                 secureTextEntry
               />
-              <Touchable onPress={handleSubmit} style={styles.loginBtn}>
+              <Touchable
+                disabled={loading}
+                onPress={handleSubmit}
+                style={styles.loginBtn}>
                 <Text style={styles.loginBtnText}>登录</Text>
               </Touchable>
             </View>

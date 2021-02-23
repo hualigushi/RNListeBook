@@ -1,10 +1,20 @@
+import Toast from 'react-native-root-toast';
 import homeModel from '@/models/home';
 import {create, Model} from 'dva-core-ts';
 import createLoading from 'dva-loading-ts';
 import modelExtend from 'dva-model-extend';
 import models from '../models';
 // 1.创建实例
-const app = create();
+const app = create({
+  onError: (e) => {
+    Toast.show('网络异常！', {
+      position: Toast.positions.CENTER,
+      duration: Toast.durations.LONG,
+      shadow: true,
+      animation: true,
+    });
+  },
+});
 
 // 2. 加载model对象
 models.forEach((model) => {

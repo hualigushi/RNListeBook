@@ -3,6 +3,7 @@ import {Model, Effect, SubscriptionsMapObject} from 'dva-core-ts';
 import {Reducer} from 'redux';
 import storage, {storageLoad} from '@/config/storage';
 import {goBack} from '../utils';
+import Toast from 'react-native-root-toast';
 
 const USER_URL = '/mock/11/bear/login';
 
@@ -67,7 +68,7 @@ const userModel: UserModel = {
       }
     },
     *login({payload}, {call, put}) {
-      const {data, status} = yield call(axios.post, USER_URL, payload);
+      const {data, status, msg} = yield call(axios.post, USER_URL, payload);
       if (status === 100) {
         yield put({
           type: 'setState',
@@ -81,6 +82,13 @@ const userModel: UserModel = {
           data: data,
         });
         goBack(); // 登录成功后返回
+      } else {
+        Toast.show(msg, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.CENTER,
+          shadow: true,
+          animation: true,
+        });
       }
     },
     *logout(_, {put}) {
