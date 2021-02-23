@@ -37,7 +37,7 @@ const initialState = {
 /**
  * 登录模块的model
  */
-const PlayerModel: UserModel = {
+const userModel: UserModel = {
   namespace: 'user',
   state: initialState,
   reducers: {
