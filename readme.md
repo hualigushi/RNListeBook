@@ -275,3 +275,7 @@ react native是有手势响应系统的，比如View组件就有一系列的函�
 
 ## 表单
 `npm install formik -S`
+
+## 表单校验
+`npm install yup -S`
+`npm install @types/yup -D`
