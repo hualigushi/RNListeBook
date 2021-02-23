@@ -2,6 +2,7 @@ import axios from 'axios';
 import {Model, Effect, SubscriptionsMapObject} from 'dva-core-ts';
 import {Reducer} from 'redux';
 import storage, {storageLoad} from '@/config/storage';
+import { goBack } from '../utils';
 
 const USER_URL = '/mock/11/bear/login';
 
@@ -71,6 +72,7 @@ const userModel: UserModel = {
             user: data,
           },
         });
+        goBack(); // 登录成功后返回
       }
       // storage.save({
       //   key: 'user', // 注意:请不要在key中使用_下划线符号!
