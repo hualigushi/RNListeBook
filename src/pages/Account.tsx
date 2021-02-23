@@ -1,15 +1,51 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useCallback} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import defaultAvatar from '@/assets/default_avatar.png';
 import Touchable from '@/components/Touchable';
 import {ModalStackNavigation} from '../navigator';
-interface Iprops {
+import {RootState} from '../models';
+import {connect, ConnectedProps} from 'react-redux';
+
+const mapStateToProps = ({user}: RootState) => {
+  return {
+    user: user.user,
+  };
+};
+
+const connector = connect(mapStateToProps);
+
+type ModelState = ConnectedProps<typeof connector>;
+
+interface IProps extends ModelState {
   navigation: ModalStackNavigation;
 }
-const Account: React.FC<Iprops> = ({navigation}) => {
+
+const Account: React.FC<IProps> = ({navigation, user, dispatch}) => {
   const onPress = useCallback(() => {
     navigation.navigate('Login');
   }, [navigation]);
+
+  const logout = useCallback(() => {
+    dispatch({
+      type: 'user/logout',
+    });
+  }, [dispatch]);
+
+  if (user) {
+    return (
+      <View style={styles.loginView}>
+        <Image source={{uri: user.avatar}} style={styles.avatar} />
+        <View style={styles.right}>
+          <Text>{user.name}</Text>
+        </View>
+        <Touchable style={[styles.loginBtn, {marginLeft: 15}]} onPress={logout}>
+          <Text style={styles.loginText}>退出登录</Text>
+        </Touchable>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.loginView}>
       <Image source={defaultAvatar} style={styles.avatar} />
@@ -54,4 +90,4 @@ const styles = StyleSheet.create({
     color: '#999',
   },
 });
-export default Account;
+export default connector(Account);
