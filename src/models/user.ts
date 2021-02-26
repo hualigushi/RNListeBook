@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {Model, Effect, SubscriptionsMapObject} from 'dva-core-ts';
 import {Reducer} from 'redux';
-import storage, {storageLoad} from '@/config/storage';
+import storage, {load} from '@/config/storage';
 import {goBack} from '../utils';
 import Toast from 'react-native-root-toast';
 
@@ -13,7 +13,6 @@ export interface IUser {
 }
 
 export interface UserModelState {
-  // loging: boolean;
   user?: IUser;
 }
 
@@ -32,7 +31,6 @@ export interface UserModel extends Model {
 }
 
 const initialState = {
-  // loging: false,
   user: undefined,
 };
 
@@ -55,11 +53,10 @@ const userModel: UserModel = {
   effects: {
     *loadStorage(_, {call, put}) {
       try {
-        const user = yield call(storageLoad, {key: 'user'});
+        const user = yield call(load, {key: 'user'});
         yield put({
           type: 'setState',
           payload: {
-            // loging: true,
             user: user,
           },
         });
@@ -69,11 +66,11 @@ const userModel: UserModel = {
     },
     *login({payload}, {call, put}) {
       const {data, status, msg} = yield call(axios.post, USER_URL, payload);
-      if (status === 100) {
+      console.log('*login ~ data, status, msg', data, status, msg);
+      if (status === 300) {
         yield put({
           type: 'setState',
           payload: {
-            // loging: true,
             user: data,
           },
         });
@@ -95,7 +92,6 @@ const userModel: UserModel = {
       yield put({
         type: 'setState',
         payload: {
-          // loging: false,
           user: undefined,
         },
       });

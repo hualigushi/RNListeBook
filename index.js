@@ -7,7 +7,7 @@ import 'react-native-gesture-handler';
 import App from './src';
 import {name as appName} from './app.json';
 
-if (__DEV__) {
+if (!__DEV__) {
   const emptyFunc = () => {};
   global.console.info = emptyFunc;
   global.console.log = emptyFunc;

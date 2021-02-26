@@ -1,6 +1,5 @@
 import React, {useCallback} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Field, Formik} from 'formik';
 import Touchable from '@/components/Touchable';
 import {connect, ConnectedProps} from 'react-redux';
@@ -33,6 +32,7 @@ const initialValues: Values = {
 const Login: React.FC<IProps> = ({dispatch, loading}) => {
   const onSubmit = useCallback(
     (values: Values) => {
+      console.log('values', values);
       dispatch({
         type: 'user/login',
         payload: values,
@@ -54,29 +54,23 @@ const Login: React.FC<IProps> = ({dispatch, loading}) => {
         validationSchema={validationSchema}
         initialValues={initialValues}
         onSubmit={onSubmit}>
-        {({handleSubmit}) => {
-          return (
-            <View>
-              <Field
-                component={Input}
-                placeholder="请输入账号"
-                name="account"
-              />
-              <Field
-                component={Input}
-                placeholder="请输入密码"
-                name="password"
-                secureTextEntry
-              />
-              <Touchable
-                disabled={loading}
-                onPress={handleSubmit}
-                style={styles.loginBtn}>
-                <Text style={styles.loginBtnText}>登录</Text>
-              </Touchable>
-            </View>
-          );
-        }}
+        {({handleSubmit}) => (
+          <View>
+            <Field component={Input} placeholder="请输入账号" name="account" />
+            <Field
+              component={Input}
+              placeholder="请输入密码"
+              name="password"
+              secureTextEntry
+            />
+            <Touchable
+              disabled={loading}
+              onPress={handleSubmit}
+              style={styles.loginBtn}>
+              <Text style={styles.loginBtnText}>登录</Text>
+            </Touchable>
+          </View>
+        )}
       </Formik>
     </ScrollView>
   );

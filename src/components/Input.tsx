@@ -1,5 +1,4 @@
 import {FieldInputProps, FormikProps} from 'formik';
-import {result} from 'lodash';
 import React from 'react';
 import {StyleSheet, Text, TextInput, TextInputProps, View} from 'react-native';
 
@@ -13,7 +12,7 @@ const Input: React.FC<IProps> = React.memo(({field, form, ...rest}) => {
       <TextInput
         style={styles.input}
         {...rest}
-        onChange={form.handleChange(field.name)}
+        onChangeText={form.handleChange(field.name)}
         onBlur={form.handleBlur(field.name)}
         value={form.values[field.name]}
       />
