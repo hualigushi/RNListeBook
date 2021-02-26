@@ -168,3 +168,161 @@ react native是有手势响应系统的，比如View组件就有一系列的函�
 
 ## 信息提示
 `npm install react-native-root-toast -S`
+
+## 启动页配置
+1. `npm install react-native-splash-screen -S`
+项目刚打开后会有一段时间白屏，因为react要去加载js
+原理： 在应用刚加载时显示一张图片，等到js加载完成后，在需要的时机将图片替换掉
+
+2. 创建安卓布局文件
+在`\android\app\src\main\res`（用来存放android的资源文件，安卓系统会对mipmap文件夹下的图片进行纹理技术优化）创建文件夹layout
+layout文件夹中创建文件`launch_screen.xml`, 这是应用刚打开时显示的页面
+```
+launch_screen.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+        <ImageView 
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent" 
+        android:src="@drawable/launch_screen"/>
+</RelativeLayout>
+```
+
+3. 在`\android\app\src\main\res`创建文件夹drawable，存放图片
+
+4. 在`\android\app\src\main\res\values`下创建`colors.xml`
+```
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+</resources>
+```
+
+4. `\android\app\src\main\res\values\styles.xml`中新增主题
+```
+ <style name="SplashScreenTheme" parent="SplashScreen_SplashTheme">
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+  </style>
+```
+
+5. `android\app\src\main\java\com\rnlistebook\MainActivity.java`
+```
+package com.rnlistebook;
+
+import com.facebook.react.ReactActivity;
+import android.os.bundle;
+import org.devio.rn.splashscreen.SplashScreen;
+
+public class MainActivity extends ReactActivity {
+
+  /**
+   * Returns the name of the main component registered from JavaScript. This is used to schedule
+   * rendering of the component.
+   */
+  @Override
+  protected String getMainComponentName() {
+    return "RNListeBook";
+  }
+
+  // 重写onCreate方法，整个RN项目加载的入口
+  @Override
+  protected void onCreate(Bundle savedInstanceState){
+    SplashScreen.show(this, R.style.SplashScreenTheme);
+    super.onCreate(savedInstanceState);
+  }
+}
+```
+
+
+
+7. 隐藏图片
+`src\navigator\index.tsx`
+
+```
+import Splash from 'react-native-splash-screen';
+...
+useEffect(() => {
+    Splash.hide();
+  }, []);
+```
+
+## 打包分包配置
+1. `android\build.gradle`
+
+```
+defaultConfig {
+  ...
+  multiDexEnabled true
+}
+
+dependencies {
+  ...
+  implementation 'anroidx.multidex:multidex:2.0.1'
+}
+```
+
+2. `\android\app\src\main\java\com\rnlistebook\MainApplication.java`
+```
+import androidx.multidex.MultiDexApplication;
+public class MainApplication extends MultiDexApplication implements ReactApplication {
+```
+
+## 打包版本配置 
+1. `.env`
+```
+APP_NAME=听书
+VERSIONCODE=1
+VERSIONNAME=1.0.0
+```
+
+2. `android\app\build.gradle`
+```
+defaultConfig {
+  versionCode project.env.get("VERSIONCODE").toInteger()
+  versionName project.env.get("VERSIONNAME")
+}
+```
+
+3. `android\app\src\main\res\values\strings.xml`
+```
+<resources>
+    <string name="app_name">@string/APP_NAME</string>
+</resources>
+```
+
+4. 根目录新建 `.env.production`
+修改 APP_URL 为生产环境地址(android 9.0 以上禁止使用http协议)
+
+解决方法
+`android\app\src\main\res\xml\network_security_config.xml`
+```
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+<base-config cleartextTrafficPermitted="true" />
+</network-security-config>
+```
+
+`\android\app\src\main\AndroidManifest.xml`
+```
+      android:networkSecurityConfig="@xml/network_security_config"
+```
+
+## 生产环境去除打印
+重置console函数
+`index.js`
+```
+if (__DEV__) {
+  const emptyFunc = () => {};
+  global.console.info = emptyFunc;
+  global.console.log = emptyFunc;
+  global.console.warn = emptyFunc;
+  global.console.error = emptyFunc;
+}
+```
+
+## 应用图标
+替换`android\app\src\main\res`下mipmap的图片

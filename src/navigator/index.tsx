@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   NavigationContainer,
   NavigationState,
@@ -20,6 +20,7 @@ import Icon from '@/assets/iconfont';
 import PlayView from '@/pages/views/PlayView';
 import {getActiveRouteName, navigationRef} from '../utils';
 import Login from '@/pages/Login';
+import Splash from 'react-native-splash-screen';
 
 export type RootStackParamList = {
   BottomTabs: {
@@ -193,6 +194,10 @@ const Navigator: React.FC = () => {
       const name = getActiveRouteName(state);
       setRouteName(name);
     }
+  }, []);
+
+  useEffect(() => {
+    Splash.hide();
   }, []);
   return (
     // 堆栈导航器嵌套标签导航器
